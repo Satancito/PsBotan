@@ -1,54 +1,69 @@
-[CmdletBinding()]
+[CmdletBinding(DefaultParameterSetName="List_Modules")]
 param (
     [Parameter(ParameterSetName = "List_Modules")]
     [switch]
     $ListModules,
 
     [Parameter(ParameterSetName = "Build_VisualCpp_Debug", Mandatory = $true)]
+    [Parameter(ParameterSetName = "Build_VisualCpp_Release", Mandatory = $true)]
     [Parameter(ParameterSetName = "Build_Emscripten_Debug", Mandatory = $true)]
+    [Parameter(ParameterSetName = "Build_Emscripten_Release", Mandatory = $true)]
     [switch]
     $Build, 
     
     [Parameter(ParameterSetName = "Build_VisualCpp_Debug", Mandatory = $true)]
+    [Parameter(ParameterSetName = "Build_VisualCpp_Release", Mandatory = $true)]
     [switch]
     $VisualCppCompiler,
 
     [Parameter(ParameterSetName = "Build_Emscripten_Debug", Mandatory = $true)]
+    [Parameter(ParameterSetName = "Build_Emscripten_Release", Mandatory = $true)]
     [switch]
     $EmscriptenCompiler,
 
-    [Parameter(ParameterSetName = "Build_VisualCpp_Debug", Mandatory = $true)]
-    [Parameter(ParameterSetName = "Build_Emscripten_Debug", Mandatory = $true)]
+    [Parameter(ParameterSetName = "Build_VisualCpp_Release", Mandatory = $true)]
+    [Parameter(ParameterSetName = "Build_Emscripten_Release", Mandatory = $true)]
     [switch]
-    $DebugMode,
+    $ReleaseMode,
 
     [Parameter(ParameterSetName = "Build_VisualCpp_Debug", Mandatory = $true)]
+    [Parameter(ParameterSetName = "Build_VisualCpp_Release", Mandatory = $true)]
     [ValidateSet("2022")]
     [string]
     $VisualStudioVersion,
 
     [Parameter(ParameterSetName = "List_Modules", Mandatory = $true)]
     [Parameter(ParameterSetName = "Build_VisualCpp_Debug", Mandatory = $true)]
+    [Parameter(ParameterSetName = "Build_VisualCpp_Release", Mandatory = $true)]
     [Parameter(ParameterSetName = "Build_Emscripten_Debug", Mandatory = $true)]
+    [Parameter(ParameterSetName = "Build_Emscripten_Release", Mandatory = $true)]
     [ValidateSet("3.2.0")]
     [string]
     $Version,
 
     [Parameter(ParameterSetName = "Build_VisualCpp_Debug", Mandatory = $false)]
+    [Parameter(ParameterSetName = "Build_VisualCpp_Release", Mandatory = $false)]
     [Parameter(ParameterSetName = "Build_Emscripten_Debug", Mandatory = $false)]
+    [Parameter(ParameterSetName = "Build_Emscripten_Release", Mandatory = $false)]
     [string[]]
     $BotanModules = @(),
 
     [Parameter(ParameterSetName = "Build_VisualCpp_Debug", Mandatory = $false)]
+    [Parameter(ParameterSetName = "Build_VisualCpp_Release", Mandatory = $false)]
     [Parameter(ParameterSetName = "Build_Emscripten_Debug", Mandatory = $false)]
+    [Parameter(ParameterSetName = "Build_Emscripten_Release", Mandatory = $false)]
     [string[]]
     $BotanOptions = @(),
 
-    [Parameter()]
+    [Parameter(ParameterSetName = "Build_VisualCpp_Debug", Mandatory = $false)]
+    [Parameter(ParameterSetName = "Build_VisualCpp_Release", Mandatory = $false)]
+    [Parameter(ParameterSetName = "Build_Emscripten_Debug", Mandatory = $false)]
+    [Parameter(ParameterSetName = "Build_Emscripten_Release", Mandatory = $false)]
     [string]
     $DestinationDir = "$PSScriptRoot/Dist",
 
     [Parameter(ParameterSetName = "Build_VisualCpp_Debug", Mandatory = $true)]
+    [Parameter(ParameterSetName = "Build_VisualCpp_Release", Mandatory = $true)]
     [string]
     [ValidateSet("X86", "X64", "ARM64")]
     $Target
@@ -59,9 +74,11 @@ Import-Module -Name "$(Get-Item "$PSScriptRoot/Z-PsCoreFxs.ps1")" -Force -NoClob
 Write-InfoDarkGray "▶▶▶ Running: $PSCommandPath"
 
 $VISUAL_CPP_DEBUG_PARAMETER_SET = "Build_VisualCpp_Debug"
+$VISUAL_CPP_RELEASE_PARAMETER_SET = "Build_VisualCpp_Release"
 $EMSCRIPTEN_DEBUG_PARAMETER_SET = "Build_Emscripten_Debug"
-$VISUAL_CPP_PARAMETER_SETS = @($VISUAL_CPP_DEBUG_PARAMETER_SET)
-$EMSCRIPTEN_PARAMETER_SETS = @($EMSCRIPTEN_DEBUG_PARAMETER_SET)
+$EMSCRIPTEN_RELEASE_PARAMETER_SET = "Build_Emscripten_Release"
+$VISUAL_CPP_PARAMETER_SETS = @($VISUAL_CPP_DEBUG_PARAMETER_SET, $VISUAL_CPP_RELEASE_PARAMETER_SET)
+$EMSCRIPTEN_PARAMETER_SETS = @($EMSCRIPTEN_DEBUG_PARAMETER_SET, $EMSCRIPTEN_RELEASE_PARAMETER_SET)
 $_7_ZIP_EXE = "C:\Program Files\7-Zip\7z.exe"
 $TEMP_DIR = "$(Get-UserHome)/.PsBotan"
 $EXTRA_WORKING_BUILD_DIR = "$TEMP_DIR/Build"
@@ -91,7 +108,7 @@ function Set-Vcvars {
         $ShowValues
     )
     Write-Host
-        Write-InfoBlue "Initialize environment " -NoNewline
+    Write-InfoGreen "Initialize environment " -NoNewline
     switch -CaseSensitive ($Target) {
         ($WINDOWS_X86_TARGET) {
             $vcvars = $VCVARS_X86_SCRIPT
@@ -112,7 +129,7 @@ function Set-Vcvars {
     }
     Write-InfoBlue "Running: $vcvars"
     Write-Host
-    $pattern = "^([_A-Za-z]+\w*)=(.+)$"
+    $pattern = "^([^\s=]+)=(.+)$"
     & cmd /c """$vcvars""  && SET" | . { process {
             $result = [System.Text.RegularExpressions.Regex]::Matches($_, $pattern)
             if ($result.Success) {
@@ -128,8 +145,7 @@ function Set-Vcvars {
             }
         } 
     }
-    Write-Host
-       
+    Write-Host      
 }
 
 function Test-DependencyTools {
@@ -203,12 +219,11 @@ function Show-BotanModules {
 function Build-Botan {
     try {
         Write-Host
-        Write-InfoBlue "Building Botan Version: $Version"
+        Write-InfoBlue "Update submodules"
         Write-Host
-        if (!$Run.IsPresent) {
-            $null = Test-Command "git submodule init" -ThrowOnFailure
-            $null = Test-Command "git submodule update --remote --recursive" -ThrowOnFailure
-        }
+
+        $null = Test-Command "git submodule init" -ThrowOnFailure
+        $null = Test-Command "git submodule update --remote --recursive" -ThrowOnFailure
 
         Remove-Item "$EXTRA_WORKING_BUILD_DIR" -Force -Recurse -ErrorAction Ignore
         New-Item "$EXTRA_WORKING_BUILD_DIR" -ItemType Directory -Force | Out-Null
@@ -217,7 +232,7 @@ function Build-Botan {
     
         $prefix = "Botan-$version"
         $options = @()
-        if ($DebugMode.IsPresent) {
+        if (!$ReleaseMode.IsPresent) {
             $options += "--debug-mode"
             $options += "--with-debug-info"
             $options += "--no-optimizations"
@@ -240,7 +255,12 @@ function Build-Botan {
             $options += "--cc=msvc"
             $options += "--minimized-build"
             $options += "--prefix=$DestinationDir/$prefix"
-            Write-InfoBlue "█ Building - $prefix"
+
+            Write-Host
+            Write-InfoBlue "Building - $prefix"
+            Write-Host
+
+            
             Set-Vcvars $Target -ShowValues
             Remove-Item "$DestinationDir/$prefix" -Force -Recurse -ErrorAction Ignore
             New-Item "$DestinationDir/$prefix" -ItemType Directory -Force | Out-Null
@@ -266,7 +286,7 @@ function Build-Botan {
             Remove-Item "$DestinationDir/$prefix" -Force -Recurse -ErrorAction Ignore
             New-Item "$DestinationDir/$prefix" -ItemType Directory -Force | Out-Null
             & $env:EMSCRIPTEN_EMCONFIGURE python "$BOTAN_UNZIPPED_DIR/configure.py" $options $BotanOptions --enable-modules=$($BotanModules -join ",")
-            & $env:EMSCRIPTEN_EMMAKE make make -C "$BOTAN_UNZIPPED_DIR/Makefile" install
+            & $env:EMSCRIPTEN_EMMAKE make install
             exit
         }
         exit
