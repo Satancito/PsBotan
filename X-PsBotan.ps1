@@ -243,6 +243,8 @@ function Build-Botan {
             $prefix += "-Release"
         }
         if ($BotanModules.Count -gt 0) {
+            Write-Host "MODULES ADD"
+            $options += "--minimized-build"
             $options += "--enable-modules=$($BotanModules -join ",")"
         }
         # WINDOWS - VISUAL C++
@@ -256,7 +258,6 @@ function Build-Botan {
             $options += "--cpu=$Target"
             $options += "--os=windows"
             $options += "--cc=msvc"
-            $options += "--minimized-build"
             $options += "--prefix=$DestinationDir/$prefix"
 
             Write-Host
@@ -279,7 +280,6 @@ function Build-Botan {
             $options += "--os=emscripten"
             $options += "--cc=emcc"
             $options += "--disable-shared-library"
-            $options += "--minimized-build"
             $options += "--prefix=$DestinationDir/$prefix"
             Write-Host "█ Building - $prefix"
             if ($IsWindows) {
