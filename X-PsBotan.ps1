@@ -1,4 +1,4 @@
-[CmdletBinding(DefaultParameterSetName="List_Modules")]
+[CmdletBinding(DefaultParameterSetName = "List_Modules")]
 param (
     [Parameter(ParameterSetName = "List_Modules")]
     [switch]
@@ -242,6 +242,9 @@ function Build-Botan {
         else {
             $prefix += "-Release"
         }
+        if ($BotanModules.Count -gt 0) {
+            $options += "--enable-modules=$($BotanModules -join ",")"
+        }
         # WINDOWS - VISUAL C++
         if ($PSCmdlet.ParameterSetName -in $VISUAL_CPP_PARAMETER_SETS) {
             if (!($env:PROCESSOR_ARCHITECTURE -eq "AMD64")) {
@@ -264,8 +267,8 @@ function Build-Botan {
             Set-Vcvars $Target -ShowValues
             Remove-Item "$DestinationDir/$prefix" -Force -Recurse -ErrorAction Ignore
             New-Item "$DestinationDir/$prefix" -ItemType Directory -Force | Out-Null
-            & python "$BOTAN_UNZIPPED_DIR/configure.py" $options $BotanOptions --enable-modules=$($BotanModules -join ",")
-            & nmake install
+            & python "$BOTAN_UNZIPPED_DIR/configure.py" $options $BotanOptions
+            #& nmake install
             exit
         }
         # EMSCRIPTEN
@@ -285,7 +288,7 @@ function Build-Botan {
             }
             Remove-Item "$DestinationDir/$prefix" -Force -Recurse -ErrorAction Ignore
             New-Item "$DestinationDir/$prefix" -ItemType Directory -Force | Out-Null
-            & $env:EMSCRIPTEN_EMCONFIGURE python "$BOTAN_UNZIPPED_DIR/configure.py" $options $BotanOptions --enable-modules=$($BotanModules -join ",")
+            & $env:EMSCRIPTEN_EMCONFIGURE python "$BOTAN_UNZIPPED_DIR/configure.py" $options $BotanOptions #--enable-modules=$($BotanModules -join ",")
             & $env:EMSCRIPTEN_EMMAKE make install
             exit
         }
