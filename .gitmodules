@@ -1,0 +1,4 @@
+
+[submodule "modules/InsaneEmscripten"]
+	path = modules/InsaneEmscripten
+	url = https://github.com/Satancito/InsaneEmscripten.git
