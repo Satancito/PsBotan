@@ -243,7 +243,6 @@ function Build-Botan {
             $prefix += "-Release"
         }
         if ($BotanModules.Count -gt 0) {
-            Write-Host "MODULES ADD"
             $options += "--minimized-build"
             $options += "--enable-modules=$($BotanModules -join ",")"
         }
@@ -264,12 +263,11 @@ function Build-Botan {
             Write-InfoBlue "Building - $prefix"
             Write-Host
 
-            
             Set-Vcvars $Target -ShowValues
             Remove-Item "$DestinationDir/$prefix" -Force -Recurse -ErrorAction Ignore
             New-Item "$DestinationDir/$prefix" -ItemType Directory -Force | Out-Null
             & python "$BOTAN_UNZIPPED_DIR/configure.py" $options $BotanOptions
-            #& nmake install
+            & nmake install
             exit
         }
         # EMSCRIPTEN
@@ -281,7 +279,11 @@ function Build-Botan {
             $options += "--cc=emcc"
             $options += "--disable-shared-library"
             $options += "--prefix=$DestinationDir/$prefix"
-            Write-Host "█ Building - $prefix"
+            
+            Write-Host
+            Write-InfoBlue "Building - $prefix"
+            Write-Host
+
             if ($IsWindows) {
                 Write-Warning "The compilation of Botan for Emscripten is not enabled due to issues with this platform. Use Linux, WSL instead."
                 exit
