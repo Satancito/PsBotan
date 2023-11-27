@@ -221,7 +221,7 @@ function Build-Botan {
         Write-Host
         Write-InfoBlue "Update submodules"
         Write-Host
-
+        Push-Location "$PSScriptRoot"
         $null = Test-Command "git submodule init" -ThrowOnFailure
         $null = Test-Command "git submodule update --remote --recursive" -ThrowOnFailure
 
@@ -292,6 +292,7 @@ function Build-Botan {
         exit
     }
     finally {
+        Pop-Location
         Pop-Location
     }  
 }
