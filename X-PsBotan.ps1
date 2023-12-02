@@ -319,10 +319,10 @@ function Build-Botan {
                 exit
             }
 
-            Remove-Item "$DestinationDir/$prefix" -Force -Recurse -ErrorAction Ignore
-            New-Item "$DestinationDir/$prefix" -ItemType Directory -Force | Out-Null
+            Remove-Item "$fullPrefix" -Force -Recurse -ErrorAction Ignore
+            New-Item "$fullPrefix" -ItemType Directory -Force | Out-Null
 
-            & $env:EMSCRIPTEN_EMCONFIGURE python "$BOTAN_UNZIPPED_DIR/configure.py" $options $BotanOptions #--enable-modules=$($BotanModules -join ",")
+            & $env:EMSCRIPTEN_EMCONFIGURE python "$BOTAN_UNZIPPED_DIR/configure.py" $options $BotanOptions
             & $env:EMSCRIPTEN_EMMAKE make install
             exit
         }
