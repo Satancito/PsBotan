@@ -150,42 +150,53 @@ function Set-Vcvars {
 
 function Test-DependencyTools {
     Write-Host
-    Write-InfoBlue "Test dependency tools..."
-    Write-Host
-    $result = $true
-    $result = $result -and (Test-Command "python --version")
-    Write-Host
-    
-    $result = $result -and (Test-Command "make --version")
+    Write-InfoBlue "PSBotan - Test dependency tools..."
     Write-Host
 
-    $result = $result -and (Test-Command "git --version")
+    $command = Get-Command "python"
+    Write-Host "$($command.Source)"
+    & "$($command.Source)" --version
+    Write-Host
+
+    $command = Get-Command "make"
+    Write-Host "$($command.Source)"
+    & "$($command.Source)" --version
+    Write-Host
+
+    $command = Get-Command "git"
+    Write-Host "$($command.Source)"
+    & "$($command.Source)" --version
     Write-Host
 
     if ($IsWindows) {
-        if (Test-Path -Path $_7_ZIP_EXE -PathType Leaf) {
-            $result = $result -and $true
-            Write-Host "✅ Command: $_7_ZIP_EXE"
+        $command = Get-Command "$_7_ZIP_EXE"
+        Write-Host "$($command.Source)"
+        & "$($command.Source)" h  "$($command.Source)"
+        Write-Host
+
+        if ($VisualCppCompiler.IsPresent) {
+            $command = Get-Command "$VCVARS_SCRIPT"
+            Write-Host "$($command.Source)"
+            Write-Host
         }
-        else {
-            Write-Host "❌ Command: $_7_ZIP_EXE"
-        }
+
+        $command = Get-Command "wsl"
+        Write-Host "$($command.Source)"
+        & "$($command.Source)" --version
         Write-Host
     }
 
     if ($IsLinux -or $IsMacOS) {
-        $result = $result -and (Test-Command "tar --version")
+        $command = Get-Command "tar"
+        Write-Host "$($command.Source)"
+        & "$($command.Source)" h  "$($command.Source)"
         Write-Host
-    }
-
-    if (!$result) {
-        throw "Dependency tools are required."
     }
 }
 
 function Get-Botan {
     Write-Host
-    Write-InfoBlue "Downloading Botan Version: $Version"
+    Write-InfoBlue "PSBotan - Downloading Botan Version: $Version"
     Write-Host
     New-Item -Path "$TEMP_DIR" -ItemType Directory -Force | Out-Null
     Remove-Item -Path "$BOTAN_UNZIPPED_DIR" -Force -Recurse -ErrorAction Ignore
@@ -211,7 +222,7 @@ function Get-Botan {
 
 function Show-BotanModules {
     Write-Host
-    Write-InfoBlue "Botan modules list:"
+    Write-InfoBlue "PSBotan - Botan modules list:"
     Write-Host
     & python "$BOTAN_UNZIPPED_DIR\configure.py" --list-modules
 }
@@ -219,7 +230,7 @@ function Show-BotanModules {
 function Build-Botan {
     try {
         Write-Host
-        Write-InfoBlue "Update submodules"
+        Write-InfoBlue "PSBotan - Update submodules"
         Write-Host
         Push-Location "$PSScriptRoot"
         $null = Test-Command "git submodule init" -ThrowOnFailure
@@ -280,16 +291,37 @@ function Build-Botan {
             $options += "--disable-shared-library"
             $options += "--prefix=$DestinationDir/$prefix"
             
+            $fullPrefix = "$DestinationDir/$prefix"
             Write-Host
             Write-InfoBlue "Building - $prefix"
             Write-Host
 
             if ($IsWindows) {
-                Write-Warning "The compilation of Botan for Emscripten is not enabled due to issues with this platform. Use Linux, WSL instead."
+                $params = @{
+                    "Script" = (Get-WslPath -Path "$PSCommandPath")
+                    "ReleaseMode" = $ReleaseMode 
+                    "Version" = $Version
+                    "BotanModules" = $BotanModules
+                    "BotanOptions" = $BotanOptions
+                    "DestinationDir" =  (Get-WslPath -Path $DestinationDir)
+                }
+                Write-Warning "Incompatible platform. Using WSL."
+                & wsl pwsh -Command {
+                    $params = $args[0]
+                    & "$($params.Script)" -Build `
+                    -EmscriptenCompiler `
+                    -ReleaseMode:$params.ReleaseMode.IsPresent `
+                    -Version "$($params.Version)" `
+                    -BotanModules $params.BotanModules `
+                    -BotanOptions $params.BotanOptions `
+                    -DestinationDir $params.DestinationDir
+                } -args $params
                 exit
             }
+
             Remove-Item "$DestinationDir/$prefix" -Force -Recurse -ErrorAction Ignore
             New-Item "$DestinationDir/$prefix" -ItemType Directory -Force | Out-Null
+
             & $env:EMSCRIPTEN_EMCONFIGURE python "$BOTAN_UNZIPPED_DIR/configure.py" $options $BotanOptions #--enable-modules=$($BotanModules -join ",")
             & $env:EMSCRIPTEN_EMMAKE make install
             exit

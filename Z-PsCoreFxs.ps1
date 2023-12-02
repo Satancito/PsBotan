@@ -1217,7 +1217,12 @@ function Set-LocalEnvironmentVariable {
         WWrite-Host "Local Environment variable " -ForegroundColor DarkYellow -NoNewline
         Write-Host "`"$VarName`"" -NoNewline -ForegroundColor Yellow
         Write-Host "  ➡  " -ForegroundColor DarkYellow -NoNewline
-        Write-Host "`"$((Get-Item env:$VarName).Value)`"" -ForegroundColor Yellow
+        try {
+            Write-Host "`"$((Get-Item env:$VarName).Value)`"" -ForegroundColor Yellow
+        }
+        catch {
+            Write-Host """""" -ForegroundColor Yellow
+        }
     }
 
     if ($Append.IsPresent) {
@@ -1225,7 +1230,7 @@ function Set-LocalEnvironmentVariable {
             $Value = (Get-Item "env:$Name").Value + $Value
         }
     }
-    Set-Item env:$Name -Value "$value" | Out-Null
+    New-Item env:$Name -Value "$value" -Force | Out-Null
     if ($PSBoundParameters.Verbose.IsPresent) {
         Write-MyMessage -VarName $Name
     }
@@ -1254,7 +1259,12 @@ function Set-PersistentEnvironmentVariable {
         Write-Host "Persistent Environment variable " -NoNewline -ForegroundColor DarkYellow
         Write-Host "`"$VarName`"" -NoNewline -ForegroundColor Yellow
         Write-Host "  ➡  " -NoNewline -ForegroundColor DarkYellow
-        Write-Host "`"$((Get-Item env:$VarName).Value)`"" -ForegroundColor Yellow
+        try {
+            Write-Host "`"$((Get-Item env:$VarName).Value)`"" -ForegroundColor Yellow
+        }
+        catch {
+            Write-Host """""" -ForegroundColor Yellow
+        }
     }
 
     Set-LocalEnvironmentVariable -Name $Name -Value $Value -Append:$Append
@@ -1268,29 +1278,25 @@ function Set-PersistentEnvironmentVariable {
         }
         return
     }
-    $pattern = "\s*export[ \t]+$Name=[\w]*[ \t]*>[ \t]*\/dev\/null[ \t]*;[ \t]*#[ \t]*$Name\s*"
-    if ($IsLinux) {
-        $file = "~/.bash_profile"
-        $content = (Get-Content "$file" -ErrorAction Ignore -Raw) + [System.String]::Empty
-        $content = [System.Text.RegularExpressions.Regex]::Replace($content, $pattern, [String]::Empty);
-        $content += [System.Environment]::NewLine + [System.Environment]::NewLine + "export $Name=$Value > /dev/null ;  # $Name"
-        Set-Content "$file" -Value $content -Force
+    if ($IsLinux -or $IsMacOS) {
+        $pattern = "\s*export\s+$name=[\w\W]*\w*\s+>\s*\/dev\/null\s+;\s*#\s*$Name\s*"
+        $files = @("~/.bashrc", "~/.zshrc", "~/.bash_profile", "~/.zprofile")
+        
+        $files | ForEach-Object {
+            if (Test-Path -Path $_ -PathType Leaf) {
+                $content = [System.IO.File]::ReadAllText("$(Resolve-Path $_)")
+                $content = [System.Text.RegularExpressions.Regex]::Replace($content, $pattern, [System.Environment]::NewLine);
+                $content += [System.Environment]::NewLine + "export $Name=$Value > /dev/null ;  # $Name" + [System.Environment]::NewLine
+                [System.IO.File]::WriteAllText("$(Resolve-Path $_)", $content)
+            }
+            
+        }
         if ($PSBoundParameters.Verbose.IsPresent) {
             Write-MyMessage -VarName $Name
         }
         return
     }
-    if ($IsMacOS) {
-        $file = "~/.zprofile"
-        $content = (Get-Content "$file" -ErrorAction Ignore -Raw) + [System.String]::Empty
-        $content = [System.Text.RegularExpressions.Regex]::Replace($content, $pattern, [String]::Empty);
-        $content += [System.Environment]::NewLine + [System.Environment]::NewLine + "export $Name=$Value > /dev/null ;  # $Name"
-        Set-Content "$file" -Value $content -Force
-        if ($PSBoundParameters.Verbose.IsPresent) {
-            Write-MyMessage -VarName $Name
-        }
-        return
-    }
+    
     throw "Invalid platform."
 }
 
@@ -1372,6 +1378,20 @@ function Remove-ItemTree {
     }
 }
 
+function Get-WslPath {
+    param (
+        [string]$Path
+    )
+    if ($Path -match '^([A-Za-z]):\\') {
+        $drive = $matches[1].ToLower()
+        $result = "/mnt/$drive" + ($Path -replace '^([A-Za-z]):\\', '/')
+        $result = $result.Replace("\", "/")
+        return $result 
+    } else {
+        throw "Invalid path '$Path'."
+    }
+}
+
 function Test-GitRepository {
     param (
         [Parameter()]
@@ -1383,11 +1403,86 @@ function Test-GitRepository {
     }
     try {
         Push-Location $Path
-        $result = $(Test-Command "git rev-parse --is-inside-work-tree --quiet")
+        $result = $(Test-Command "git rev-parse --is-inside-work-tree --quiet" -NoOutput)
         return $result
     }
     finally {
         Pop-Location
+    }
+}
+
+function Test-GitRemoteUrl {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]
+        $Url,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $Path
+    )
+    try {
+        Push-Location $Path
+        $remoteUrl = & git remote get-url origin
+        return ($remoteUrl -eq $Url)
+    }
+    catch
+    {
+        return $false
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+function Install-GitRepository {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]
+        $Url,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $Path,
+
+        [Parameter(Mandatory = $false)]
+        [switch]
+        $Force
+
+    )
+    $isRepo = Test-GitRepository $Path
+
+    if ($isRepo) {
+        if(Test-GitRemoteUrl -Url $Url -Path $Path)
+        {
+            try {
+                Push-Location "$Path"
+                $null = Test-Command "git fetch origin" -ThrowOnFailure
+                $null = Test-Command "git reset --hard origin/main" -ThrowOnFailure
+            }
+            finally {
+                Pop-Location 
+            }
+        }
+        else
+        {
+            if($Force.IsPresent)
+            {
+                Remove-Item -Path "$Path" -Force -Recurse -ErrorAction Ignore
+                git clone "$Url" "$Path"
+            }
+            else
+            {
+                throw "It seems there is a different Git repository. Please check and try again."
+            }
+        }   
+    }
+    else {
+        Remove-Item -Path "$Path" -Force -Recurse -ErrorAction Ignore
+        New-Item -Path "$Path" -Force -ItemType Directory | Out-Null
+        git clone "$Url" "$Path"
     }
 }
 
@@ -1408,7 +1503,6 @@ function Set-GitRepository {
     try {
         Push-Location $Path
         git clone $RepositoryUrl
-        Test-LastExitCode
     }
     finally {
         Pop-Location
@@ -1545,12 +1639,10 @@ function Test-Command {
         $ThrowOnFailure 
     )
     try {
-        if($NoOutput.IsPresent)
-        {
+        if ($NoOutput.IsPresent) {
             Invoke-Expression -Command $Command | Out-Null
         }
-        else
-        {
+        else {
             Invoke-Expression -Command $Command | Out-Host
         }
         $exitCode = $LASTEXITCODE
@@ -1567,8 +1659,7 @@ function Test-Command {
         if (!$NoOutput.IsPresent) {
             Write-Host "❌ Command: $Command"
         }
-        if($ThrowOnFailure)
-        {
+        if ($ThrowOnFailure) {
             throw "An error occurred while executing the command."
         }
         return $false
@@ -1597,8 +1688,7 @@ function Get-GitRepositoryRemoteUrl {
         $Path = [string]::Empty
     )
 
-    if([string]::IsNullOrWhiteSpace($Path))
-    {
+    if ([string]::IsNullOrWhiteSpace($Path)) {
         $Path = "$(Get-Location)"
     }
     $result = [string]::Empty
@@ -1606,7 +1696,7 @@ function Get-GitRepositoryRemoteUrl {
         Push-Location $Path
         return "$(Split-Path -Path (git remote get-url origin) -Leaf -ErrorAction Ignore)"
     }
-    catch{
+    catch {
         return $result
     }
     finally {

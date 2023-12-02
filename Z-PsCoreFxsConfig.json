@@ -20,7 +20,7 @@
     "Z-PsCoreFxs.ps1",
     "Z-PsCoreFxsConfig.json"
   ],
-  "Build": 115,
+  "Build": 124,
   "LastSupportedFiles": [
     "X-PsCoreFxs-PublishProjectPackage.ps1",
     "X-PsCoreFxs-PushProjectToRemote.ps1",
