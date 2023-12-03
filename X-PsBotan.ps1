@@ -60,7 +60,7 @@ param (
     [Parameter(ParameterSetName = "Build_Emscripten_Debug", Mandatory = $false)]
     [Parameter(ParameterSetName = "Build_Emscripten_Release", Mandatory = $false)]
     [string]
-    $DestinationDir = "$PSScriptRoot/Dist",
+    $DestinationDir = [string]::Empty,
 
     [Parameter(ParameterSetName = "Build_VisualCpp_Debug", Mandatory = $true)]
     [Parameter(ParameterSetName = "Build_VisualCpp_Release", Mandatory = $true)]
@@ -73,6 +73,11 @@ $ErrorActionPreference = "Stop"
 Import-Module -Name "$(Get-Item "$PSScriptRoot/Z-PsCoreFxs.ps1")" -Force -NoClobber
 Write-InfoDarkGray "▶▶▶ Running: $PSCommandPath"
 
+if([String]::IsNullOrWhiteSpace($DestinationDir))
+{
+    $DestinationDir = "$(Get-UserHome)/.CppLibs"
+    New-Item -Path $DestinationDir -PathType Directory -Force | Out-Null
+}
 $VISUAL_CPP_DEBUG_PARAMETER_SET = "Build_VisualCpp_Debug"
 $VISUAL_CPP_RELEASE_PARAMETER_SET = "Build_VisualCpp_Release"
 $EMSCRIPTEN_DEBUG_PARAMETER_SET = "Build_Emscripten_Debug"
