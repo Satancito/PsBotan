@@ -316,7 +316,7 @@ function Build-Botan {
                     -BotanOptions $params.BotanOptions `
                     -DestinationDir $params.DestinationDir
                 } -args $params
-                exit
+                return
             }
 
             Remove-Item "$fullPrefix" -Force -Recurse -ErrorAction Ignore
@@ -324,9 +324,9 @@ function Build-Botan {
 
             & $env:EMSCRIPTEN_EMCONFIGURE python "$BOTAN_UNZIPPED_DIR/configure.py" $options $BotanOptions
             & $env:EMSCRIPTEN_EMMAKE make install
-            exit
+            return
         }
-        exit
+        return
     }
     finally {
         Pop-Location
@@ -344,6 +344,7 @@ if ($ListModules.IsPresent) {
 
 if ($Build.IsPresent) {
     Build-Botan
+    exit
 }
 
 
