@@ -283,7 +283,6 @@ function Build-Botan {
         }
         # EMSCRIPTEN
         if ($PSCmdlet.ParameterSetName -in $EMSCRIPTEN_PARAMETER_SETS) {
-            & "$EMSCRIPTEN_INSTALL_SCRIPT" -Force
             $prefix += "-Emscripten"
             $options += "--cpu=wasm"
             $options += "--os=emscripten"
@@ -321,7 +320,7 @@ function Build-Botan {
 
             Remove-Item "$fullPrefix" -Force -Recurse -ErrorAction Ignore
             New-Item "$fullPrefix" -ItemType Directory -Force | Out-Null
-
+            & "$EMSCRIPTEN_INSTALL_SCRIPT" -Force
             & $env:EMSCRIPTEN_EMCONFIGURE python "$BOTAN_UNZIPPED_DIR/configure.py" $options $BotanOptions
             & $env:EMSCRIPTEN_EMMAKE make install
             return
