@@ -76,7 +76,7 @@ Write-InfoDarkGray "▶▶▶ Running: $PSCommandPath"
 if([String]::IsNullOrWhiteSpace($DestinationDir))
 {
     $DestinationDir = "$(Get-UserHome)/.CppLibs"
-    New-Item -Path $DestinationDir -PathType Directory -Force | Out-Null
+    New-Item -Path $DestinationDir -ItemType Directory -Force | Out-Null
 }
 $VISUAL_CPP_DEBUG_PARAMETER_SET = "Build_VisualCpp_Debug"
 $VISUAL_CPP_RELEASE_PARAMETER_SET = "Build_VisualCpp_Release"
