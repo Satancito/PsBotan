@@ -310,7 +310,7 @@ function Build-Botan {
                     "DestinationDir" =  (Get-WslPath -Path $DestinationDir)
                 }
                 Write-Warning "Incompatible platform. Using WSL."
-                & wsl pwsh -Command {
+                & wsl sudo pwsh -Command {
                     $params = $args[0]
                     & "$($params.Script)" -Build `
                     -EmscriptenCompiler `
