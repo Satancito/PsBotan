@@ -238,6 +238,7 @@ function Build-Botan {
         Write-InfoBlue "PSBotan - Update submodules"
         Write-Host
         Push-Location "$PSScriptRoot"
+        
         $null = Test-Command "git submodule init" -ThrowOnFailure
         $null = Test-Command "git submodule update --remote --recursive" -ThrowOnFailure
 
@@ -310,7 +311,8 @@ function Build-Botan {
                     "DestinationDir" =  (Get-WslPath -Path $DestinationDir)
                 }
                 Write-Warning "Incompatible platform. Using WSL."
-                & wsl sudo pwsh -Command {
+                & wsl pwsh -Command {
+                    & whoami
                     $params = $args[0]
                     & "$($params.Script)" -Build `
                     -EmscriptenCompiler `
@@ -327,6 +329,12 @@ function Build-Botan {
             New-Item "$fullPrefix" -ItemType Directory -Force | Out-Null
             & "$EMSCRIPTEN_INSTALL_SCRIPT" -Force
             & $env:EMSCRIPTEN_EMCONFIGURE python "$BOTAN_UNZIPPED_DIR/configure.py" $options $BotanOptions
+            # $makefile = "$BOTAN_UNZIPPED_DIR/Makefile"
+            # $makefileContent = [System.IO.File]::ReadAllText($makefile)
+            # $pattern = "^install:.*$"
+            # $replacement = "install: libs docs"
+            # $makefileContent = [System.Text.RegularExpressions.Regex]::Replace("$makefileContent", "$pattern", $replacement, [System.Text.RegularExpressions.RegexOptions]::Multiline)
+            # [System.IO.File]::WriteAllText($makefile, $makefileContent)
             & $env:EMSCRIPTEN_EMMAKE make install
             return
         }

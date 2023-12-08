@@ -1436,6 +1436,58 @@ function Test-GitRemoteUrl {
     }
 }
 
+function Add-GitSafeDirectory {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]
+        $Path, 
+
+        [Parameter()]
+        [ValidateSet("system", "global", "local", "worktree")]
+        [string]
+        $ConfigFile = "global"
+
+    )
+    if(!(Test-Path $Path -PathType Container))
+    {
+        throw "Invalid path: $Path"
+    }
+    $null = Test-Command "git config --$ConfigFile --fixed-value --replace-all safe.directory ""$Path"" ""$Path""" -ThrowOnFailure
+    
+}
+
+function Reset-GitRepository {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]
+        $Path,
+
+        [Parameter()]
+        [string]
+        $RemoteName = "origin",
+
+        [Parameter()]
+        [string]
+        $BranchName = "main"
+    )
+    if(Test-GitRepository $Path)
+    {
+        try {
+            Push-Location "$Path"
+            $null = Test-Command "git fetch $RemoteName $BranchName" -ThrowOnFailure
+            $null = Test-Command "git reset --hard $RemoteName/$BranchName" -ThrowOnFailure
+            $null = Test-Command "git checkout $BranchName" -ThrowOnFailure
+        }
+        finally {
+            Pop-Location 
+        }
+    }
+    else
+    {
+        throw "Path ""$Path"" is not a repository."
+    }
+}
+
 function Install-GitRepository {
     [CmdletBinding()]
     param (
@@ -1447,9 +1499,22 @@ function Install-GitRepository {
         [string]
         $Path,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter()]
         [switch]
-        $Force
+        $Force,
+
+        [Parameter()]
+        [string]
+        $RemoteName = "origin",
+
+        [Parameter()]
+        [string]
+        $BranchName = "main",
+
+        [Parameter()]
+        [ValidateSet("system", "global", "local", "worktree")]
+        [string]
+        $ConfigFile = "global"
 
     )
     $isRepo = Test-GitRepository $Path
@@ -1457,56 +1522,30 @@ function Install-GitRepository {
     if ($isRepo) {
         if(Test-GitRemoteUrl -Url $Url -Path $Path)
         {
-            try {
-                Push-Location "$Path"
-                $null = Test-Command "git fetch origin" -ThrowOnFailure
-                $null = Test-Command "git reset --hard origin/main" -ThrowOnFailure
-            }
-            finally {
-                Pop-Location 
-            }
+            Reset-GitRepository -Path "$Path" -RemoteName "$RemoteName" -BranchName "$BranchName"
+            Add-GitSafeDirectory -ConfigFile $ConfigFile -Path $Path
         }
         else
         {
             if($Force.IsPresent)
             {
                 Remove-Item -Path "$Path" -Force -Recurse -ErrorAction Ignore
+                New-Item -Path "$Path" -Force -ItemType Directory | Out-Null
                 git clone "$Url" "$Path"
+                Add-GitSafeDirectory -ConfigFile $ConfigFile -Path $Path
             }
             else
             {
-                throw "It seems there is a different Git repository. Please check and try again."
+                throw "It seems there is a different Git repository in path ""$Path"". Use -Force to replace directory."
             }
         }   
     }
     else {
         Remove-Item -Path "$Path" -Force -Recurse -ErrorAction Ignore
         New-Item -Path "$Path" -Force -ItemType Directory | Out-Null
-        git clone "$Url" "$Path"
+        $null =  Test-Command "git clone ""$Url"" ""$Path""" -ThrowOnFailure
+        Add-GitSafeDirectory -ConfigFile $ConfigFile -Path $Path
     }
-}
-
-function Set-GitRepository {
-    param (
-        [Parameter()]
-        [System.String]
-        $RepositoryUrl,
-
-        [Parameter()]
-        [System.String]
-        $Path = [System.String]::Empty
-    )
-    $Path = ([System.String]::IsNullOrWhiteSpace($Path) ? "$X_TEMP_DIR" : $Path)
-    $folderName = ($RepositoryUrl | Split-Path -Leaf).Replace(".git", [String]::Empty)  
-    New-Item "$Path" -Force -ItemType Container | Out-Null
-    Remove-ItemTree "$Path/$folderName" -ErrorAction Ignore
-    try {
-        Push-Location $Path
-        git clone $RepositoryUrl
-    }
-    finally {
-        Pop-Location
-    } 
 }
 
 function Get-ProjectSecretsId {
@@ -1729,6 +1768,28 @@ function Install-BotanLibrary {
     #& "$(Select-ValueByPlatform -WindowsValue "tar -xvf $filename" -LinuxValue "" -MacOSValue "")"
 }
 
+function Join-CompileCommandsJson {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]
+        $SourceDir,
+        
+        [Parameter(Mandatory = $true)]
+        [string]
+        $DestinationDir
+    )
+    $jsonFiles = Get-ChildItem "$SourceDir/*.compile_commands.json"  
+    $encoding = [System.Text.Encoding]::UTF8 
+    $CompilationDatabase = "$DestinationDir/compile_commands.json"
+    [System.Text.StringBuilder]$jsonContent = [System.Text.StringBuilder]::new()
+    $jsonContent.Append("[") | Out-Null
+    $jsonFiles | ForEach-Object {
+        $jsonContent.Append([System.IO.File]::ReadAllText($_.FullName)) | Out-Null
+    }
+    $jsonContent.Append("]") | Out-Null
+    $json = (ConvertFrom-Json $jsonContent.ToString()) | ConvertTo-Json -Depth 100
+    [System.IO.File]::WriteAllText($CompilationDatabase, $json, $encoding)
+}
 
 Set-GlobalConstant -Name "X_TEMP_DIR_NAME" -Value ".PsCoreFxsTemp"
 Set-GlobalConstant -Name "X_TEMP_DIR" -Value "$(Get-UserHome)/$X_TEMP_DIR_NAME"
