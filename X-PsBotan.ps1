@@ -316,15 +316,15 @@ function Build-Botan {
                 }
                 Write-Warning "Incompatible platform. Using WSL."
                 & wsl pwsh -Command {
-                    & whoami
                     $params = $args[0]
+                    Write-Host "Wsl User:" -NoNewline ; & whoami
                     & "$($params.Script)" -Build `
                     -EmscriptenCompiler `
                     -ReleaseMode:$params.ReleaseMode.IsPresent `
                     -Version "$($params.Version)" `
                     -BotanModules $params.BotanModules `
                     -BotanOptions $params.BotanOptions `
-                    -DestinationDir $params.DestinationDir
+                    -DestinationDir $params.DestinationDir `
                     -DestinationSuffix $params.DestinationSuffix
                 } -args $params
                 return
@@ -334,12 +334,6 @@ function Build-Botan {
             New-Item "$fullPrefix" -ItemType Directory -Force | Out-Null
             & "$EMSCRIPTEN_INSTALL_SCRIPT" -Force
             & $env:EMSCRIPTEN_EMCONFIGURE python "$BOTAN_UNZIPPED_DIR/configure.py" $options $BotanOptions
-            # $makefile = "$BOTAN_UNZIPPED_DIR/Makefile"
-            # $makefileContent = [System.IO.File]::ReadAllText($makefile)
-            # $pattern = "^install:.*$"
-            # $replacement = "install: libs docs"
-            # $makefileContent = [System.Text.RegularExpressions.Regex]::Replace("$makefileContent", "$pattern", $replacement, [System.Text.RegularExpressions.RegexOptions]::Multiline)
-            # [System.IO.File]::WriteAllText($makefile, $makefileContent)
             & $env:EMSCRIPTEN_EMMAKE make install
             return
         }
