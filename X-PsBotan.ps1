@@ -325,7 +325,7 @@ function Build-Botan {
                     -BotanModules $params.BotanModules `
                     -BotanOptions $params.BotanOptions `
                     -DestinationDir $params.DestinationDir
-                    -DestinationSuffix $param.DestinationSuffix
+                    -DestinationSuffix $params.DestinationSuffix
                 } -args $params
                 return
             }
