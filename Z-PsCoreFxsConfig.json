@@ -1,7 +1,5 @@
 {
-  "Files": [
-    "X-PsCoreFxs-PushProjectToRemote.ps1"
-  ],
+  "Files": null,
   "DeprecatedFiles": [
     "X-PowerShellCoreFxs-EditProjectSecrets.ps1",
     "X-PowerShellCoreFxs-SetProjectSecrets.ps1",

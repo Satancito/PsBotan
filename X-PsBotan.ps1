@@ -245,10 +245,9 @@ function Build-Botan {
         
         $null = Test-Command "git submodule init" -ThrowOnFailure
         $null = Test-Command "git submodule update --remote --recursive" -ThrowOnFailure
-
+        
         Remove-Item "$EXTRA_WORKING_BUILD_DIR" -Force -Recurse -ErrorAction Ignore
         New-Item "$EXTRA_WORKING_BUILD_DIR" -ItemType Directory -Force | Out-Null
-        #Push-Location "$EXTRA_WORKING_BUILD_DIR"
         Push-Location "$BOTAN_UNZIPPED_DIR"
     
         $prefix = "Botan-$version"

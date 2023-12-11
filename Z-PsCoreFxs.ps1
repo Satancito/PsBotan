@@ -1776,9 +1776,13 @@ function Join-CompileCommandsJson {
         
         [Parameter(Mandatory = $true)]
         [string]
-        $DestinationDir
+        $DestinationDir,
+
+        [Parameter()]
+        [string]
+        $FilesExtension = ".compile_commands.json"
     )
-    $jsonFiles = Get-ChildItem "$SourceDir/*.compile_commands.json"  
+    $jsonFiles = Get-ChildItem "$SourceDir/*$FilesExtension"  
     $encoding = [System.Text.Encoding]::UTF8 
     $CompilationDatabase = "$DestinationDir/compile_commands.json"
     [System.Text.StringBuilder]$jsonContent = [System.Text.StringBuilder]::new()
@@ -1786,8 +1790,7 @@ function Join-CompileCommandsJson {
     $jsonFiles | ForEach-Object {
         $jsonContent.Append([System.IO.File]::ReadAllText($_.FullName)) | Out-Null
     }
-    $jsonContent.Append("]") | Out-Null
-    $json = (ConvertFrom-Json $jsonContent.ToString()) | ConvertTo-Json -Depth 100
+    $json = $jsonContent.ToString().Trim().TrimEnd(',') + "]"
     [System.IO.File]::WriteAllText($CompilationDatabase, $json, $encoding)
 }
 
