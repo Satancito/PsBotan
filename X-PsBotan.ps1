@@ -66,7 +66,11 @@ param (
     [Parameter(ParameterSetName = "Build_VisualCpp_Release", Mandatory = $true)]
     [string]
     [ValidateSet("X86", "X64", "ARM64")]
-    $Target
+    $Target,
+
+    [Parameter()]
+    [string]
+    $DestinationSuffix = "Full"
 )
 
 $ErrorActionPreference = "Stop"
@@ -270,7 +274,7 @@ function Build-Botan {
                 exit
             }
 
-            $prefix += "-Windows-$Target-Msvc"
+            $prefix += "-Windows-$Target-Msvc-$DestinationSuffix"
             $options += "--cpu=$Target"
             $options += "--os=windows"
             $options += "--cc=msvc"
@@ -289,7 +293,7 @@ function Build-Botan {
         }
         # EMSCRIPTEN
         if ($PSCmdlet.ParameterSetName -in $EMSCRIPTEN_PARAMETER_SETS) {
-            $prefix += "-Emscripten"
+            $prefix += "-Emscripten-$DestinationSuffix"
             $options += "--cpu=wasm"
             $options += "--os=emscripten"
             $options += "--cc=emcc"
