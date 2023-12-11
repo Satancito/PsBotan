@@ -312,6 +312,7 @@ function Build-Botan {
                     "BotanModules" = $BotanModules
                     "BotanOptions" = $BotanOptions
                     "DestinationDir" =  (Get-WslPath -Path $DestinationDir)
+                    "DestinationSuffix" = $DestinationSuffix
                 }
                 Write-Warning "Incompatible platform. Using WSL."
                 & wsl pwsh -Command {
@@ -324,6 +325,7 @@ function Build-Botan {
                     -BotanModules $params.BotanModules `
                     -BotanOptions $params.BotanOptions `
                     -DestinationDir $params.DestinationDir
+                    -DestinationSuffix $param.DestinationSuffix
                 } -args $params
                 return
             }
