@@ -8,6 +8,10 @@ param (
     [switch]
     $GetVersions,
 
+    [Parameter(ParameterSetName = "Get_LastVersion")]
+    [switch]
+    $GetLastVersion,
+
     [Parameter(ParameterSetName = "Build_VisualCpp_Debug", Mandatory = $true)]
     [Parameter(ParameterSetName = "Build_VisualCpp_Release", Mandatory = $true)]
     [Parameter(ParameterSetName = "Build_Emscripten_Debug", Mandatory = $true)]
@@ -35,15 +39,6 @@ param (
     [ValidateSet("2022")]
     [string]
     $VisualStudioVersion,
-
-    [Parameter(ParameterSetName = "List_Modules", Mandatory = $false)]
-    [Parameter(ParameterSetName = "Build_VisualCpp_Debug", Mandatory = $false)]
-    [Parameter(ParameterSetName = "Build_VisualCpp_Release", Mandatory = $false)]
-    [Parameter(ParameterSetName = "Build_Emscripten_Debug", Mandatory = $false)]
-    [Parameter(ParameterSetName = "Build_Emscripten_Release", Mandatory = $false)]
-    [ValidateSet("last", "3.2.0")]
-    [string]
-    $Version = "last",
 
     [Parameter(ParameterSetName = "Build_VisualCpp_Debug", Mandatory = $false)]
     [Parameter(ParameterSetName = "Build_VisualCpp_Release", Mandatory = $false)]
@@ -74,8 +69,21 @@ param (
 
     [Parameter()]
     [string]
-    $DestinationSuffix = "Full"
+    $DestinationSuffix = "Full",
+
+    [Parameter(ParameterSetName = "List_Modules", Mandatory = $false)]
+    [Parameter(ParameterSetName = "Build_VisualCpp_Debug", Mandatory = $false)]
+    [Parameter(ParameterSetName = "Build_VisualCpp_Release", Mandatory = $false)]
+    [Parameter(ParameterSetName = "Build_Emscripten_Debug", Mandatory = $false)]
+    [Parameter(ParameterSetName = "Build_Emscripten_Release", Mandatory = $false)]
+    [ValidateSet("last", "3.2.0")] # Update list.
+    [string]
+    $Version = "last"
 )
+
+function Get-BotanVersions {
+    return @("3.2.0") # Update list.
+}
 
 $ErrorActionPreference = "Stop"
 Import-Module -Name "$(Get-Item "$PSScriptRoot/Z-PsCoreFxs.ps1")" -Force -NoClobber
@@ -84,10 +92,6 @@ Write-InfoDarkGray "▶▶▶ Running: $PSCommandPath"
 if ([String]::IsNullOrWhiteSpace($DestinationDir)) {
     $DestinationDir = "$(Get-UserHome)/.CppLibs"
     New-Item -Path $DestinationDir -ItemType Directory -Force | Out-Null
-}
-
-function Get-BotanVersions {
-    return @("3.2.0")
 }
 
 $VISUAL_CPP_DEBUG_PARAMETER_SET = "Build_VisualCpp_Debug"
@@ -373,3 +377,6 @@ if ($GetVersions.IsPresent) {
     return Get-BotanVersions
 }
 
+if ($GetLastVersion.IsPresent) {
+    return (Get-BotanVersions | Select-Object -Last 1)
+}
