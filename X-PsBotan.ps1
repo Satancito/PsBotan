@@ -36,14 +36,14 @@ param (
     [string]
     $VisualStudioVersion,
 
-    [Parameter(ParameterSetName = "List_Modules", Mandatory = $true)]
-    [Parameter(ParameterSetName = "Build_VisualCpp_Debug", Mandatory = $true)]
-    [Parameter(ParameterSetName = "Build_VisualCpp_Release", Mandatory = $true)]
-    [Parameter(ParameterSetName = "Build_Emscripten_Debug", Mandatory = $true)]
-    [Parameter(ParameterSetName = "Build_Emscripten_Release", Mandatory = $true)]
-    [ValidateSet("3.2.0")]
+    [Parameter(ParameterSetName = "List_Modules", Mandatory = $false)]
+    [Parameter(ParameterSetName = "Build_VisualCpp_Debug", Mandatory = $false)]
+    [Parameter(ParameterSetName = "Build_VisualCpp_Release", Mandatory = $false)]
+    [Parameter(ParameterSetName = "Build_Emscripten_Debug", Mandatory = $false)]
+    [Parameter(ParameterSetName = "Build_Emscripten_Release", Mandatory = $false)]
+    [ValidateSet("last", "3.2.0")]
     [string]
-    $Version,
+    $Version = "last",
 
     [Parameter(ParameterSetName = "Build_VisualCpp_Debug", Mandatory = $false)]
     [Parameter(ParameterSetName = "Build_VisualCpp_Release", Mandatory = $false)]
@@ -81,11 +81,15 @@ $ErrorActionPreference = "Stop"
 Import-Module -Name "$(Get-Item "$PSScriptRoot/Z-PsCoreFxs.ps1")" -Force -NoClobber
 Write-InfoDarkGray "▶▶▶ Running: $PSCommandPath"
 
-if([String]::IsNullOrWhiteSpace($DestinationDir))
-{
+if ([String]::IsNullOrWhiteSpace($DestinationDir)) {
     $DestinationDir = "$(Get-UserHome)/.CppLibs"
     New-Item -Path $DestinationDir -ItemType Directory -Force | Out-Null
 }
+
+function Get-BotanVersions {
+    return @("3.2.0")
+}
+
 $VISUAL_CPP_DEBUG_PARAMETER_SET = "Build_VisualCpp_Debug"
 $VISUAL_CPP_RELEASE_PARAMETER_SET = "Build_VisualCpp_Release"
 $EMSCRIPTEN_DEBUG_PARAMETER_SET = "Build_Emscripten_Debug"
@@ -95,6 +99,7 @@ $EMSCRIPTEN_PARAMETER_SETS = @($EMSCRIPTEN_DEBUG_PARAMETER_SET, $EMSCRIPTEN_RELE
 $_7_ZIP_EXE = "C:\Program Files\7-Zip\7z.exe"
 $TEMP_DIR = "$(Get-UserHome)/.PsBotan"
 $EXTRA_WORKING_BUILD_DIR = "$TEMP_DIR/Build"
+$Version = ($Version -eq "last" ? (Get-BotanVersions | Select-Object -Last 1) : $Version)
 $BOTAN_URL = "https://botan.randombit.net/releases/Botan-$Version.tar.xz" 
 $BOTAN_UNZIPPED_DIR = "$TEMP_DIR/Botan-$Version"
 $BOTAN_TAR_XZ = "$TEMP_DIR/Botan-$Version.tar.xz"
@@ -107,6 +112,7 @@ $VCVARS_ARM64_SCRIPT = "C:/Program Files/Microsoft Visual Studio/$VisualStudioVe
 $WINDOWS_X86_TARGET = "X86"
 $WINDOWS_X64_TARGET = "X64"
 $WINDOWS_ARM64_TARGET = "ARM64"
+
 
 function Set-Vcvars {
     param (
@@ -310,12 +316,12 @@ function Build-Botan {
 
             if ($IsWindows) {
                 $params = @{
-                    "Script" = (Get-WslPath -Path "$PSCommandPath")
-                    "ReleaseMode" = $ReleaseMode 
-                    "Version" = $Version
-                    "BotanModules" = $BotanModules
-                    "BotanOptions" = $BotanOptions
-                    "DestinationDir" =  (Get-WslPath -Path $DestinationDir)
+                    "Script"            = (Get-WslPath -Path "$PSCommandPath")
+                    "ReleaseMode"       = $ReleaseMode 
+                    "Version"           = $Version
+                    "BotanModules"      = $BotanModules
+                    "BotanOptions"      = $BotanOptions
+                    "DestinationDir"    = (Get-WslPath -Path $DestinationDir)
                     "DestinationSuffix" = $DestinationSuffix
                 }
                 Write-Warning "Incompatible platform. Using WSL."
@@ -323,13 +329,13 @@ function Build-Botan {
                     $params = $args[0]
                     Write-Host "Wsl User:" -NoNewline ; & whoami
                     & "$($params.Script)" -Build `
-                    -EmscriptenCompiler `
-                    -ReleaseMode:$params.ReleaseMode.IsPresent `
-                    -Version "$($params.Version)" `
-                    -BotanModules $params.BotanModules `
-                    -BotanOptions $params.BotanOptions `
-                    -DestinationDir $params.DestinationDir `
-                    -DestinationSuffix $params.DestinationSuffix
+                        -EmscriptenCompiler `
+                        -ReleaseMode:$params.ReleaseMode.IsPresent `
+                        -Version "$($params.Version)" `
+                        -BotanModules $params.BotanModules `
+                        -BotanOptions $params.BotanOptions `
+                        -DestinationDir $params.DestinationDir `
+                        -DestinationSuffix $params.DestinationSuffix
                 } -args $params
                 return
             }
@@ -349,25 +355,21 @@ function Build-Botan {
     }  
 }
 
-function Get-BotanVersions {
-    return @("3.2.0")
-}
-
-Test-DependencyTools 
-Get-Botan
-
 if ($ListModules.IsPresent) {
+    Test-DependencyTools 
+    Get-Botan
     Show-BotanModules
     exit 
 }
 
 if ($Build.IsPresent) {
+    Test-DependencyTools 
+    Get-Botan
     Build-Botan
     exit
 }
 
-if($ListVersions.IsPresent)
-{
+if ($GetVersions.IsPresent) {
     return Get-BotanVersions
 }
 
