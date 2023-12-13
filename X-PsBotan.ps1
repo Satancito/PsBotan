@@ -4,6 +4,10 @@ param (
     [switch]
     $ListModules,
 
+    [Parameter(ParameterSetName = "Get_Versions")]
+    [switch]
+    $GetVersions,
+
     [Parameter(ParameterSetName = "Build_VisualCpp_Debug", Mandatory = $true)]
     [Parameter(ParameterSetName = "Build_VisualCpp_Release", Mandatory = $true)]
     [Parameter(ParameterSetName = "Build_Emscripten_Debug", Mandatory = $true)]
@@ -345,6 +349,10 @@ function Build-Botan {
     }  
 }
 
+function Get-BotanVersions {
+    return @("3.2.0")
+}
+
 Test-DependencyTools 
 Get-Botan
 
@@ -358,4 +366,8 @@ if ($Build.IsPresent) {
     exit
 }
 
+if($ListVersions.IsPresent)
+{
+    return Get-BotanVersions
+}
 
