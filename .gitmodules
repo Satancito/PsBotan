@@ -1,4 +1,4 @@
 
-[submodule "modules/InsaneEmscripten"]
-	path = modules/InsaneEmscripten
-	url = https://github.com/Satancito/InsaneEmscripten.git
+[submodule "submodules/PsEmscripten"]
+	path = submodules/PsEmscripten
+	url = https://github.com/Satancito/PsEmscripten.git
