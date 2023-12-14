@@ -102,7 +102,6 @@ $VISUAL_CPP_PARAMETER_SETS = @($VISUAL_CPP_DEBUG_PARAMETER_SET, $VISUAL_CPP_RELE
 $EMSCRIPTEN_PARAMETER_SETS = @($EMSCRIPTEN_DEBUG_PARAMETER_SET, $EMSCRIPTEN_RELEASE_PARAMETER_SET)
 $_7_ZIP_EXE = "C:\Program Files\7-Zip\7z.exe"
 $TEMP_DIR = "$(Get-UserHome)/.PsBotan"
-$EXTRA_WORKING_BUILD_DIR = "$TEMP_DIR/Build"
 $Version = ($Version -eq "last" ? (Get-BotanVersions | Select-Object -Last 1) : $Version)
 $BOTAN_URL = "https://botan.randombit.net/releases/Botan-$Version.tar.xz" 
 $BOTAN_UNZIPPED_DIR = "$TEMP_DIR/Botan-$Version"
@@ -260,8 +259,6 @@ function Build-Botan {
         $null = Test-ExternalCommand -Command "git submodule init" -ThrowOnFailure
         $null = Test-ExternalCommand -Command "git submodule update --remote --recursive" -ThrowOnFailure
         
-        Remove-Item "$EXTRA_WORKING_BUILD_DIR" -Force -Recurse -ErrorAction Ignore
-        New-Item "$EXTRA_WORKING_BUILD_DIR" -ItemType Directory -Force | Out-Null
         Push-Location "$BOTAN_UNZIPPED_DIR"
     
         $prefix = "Botan-$version"
@@ -332,7 +329,7 @@ function Build-Botan {
                 Write-Warning "Incompatible platform. Using WSL."
                 & wsl pwsh -Command {
                     $params = $args[0]
-                    Write-Host "Wsl User:" -NoNewline ; & whoami
+                    Write-Host "Wsl User: " -NoNewline ; & whoami
                     & "$($params.Script)" -Build `
                         -EmscriptenCompiler `
                         -ReleaseMode:$params.ReleaseMode.IsPresent `
