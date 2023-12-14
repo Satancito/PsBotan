@@ -108,7 +108,7 @@ $BOTAN_URL = "https://botan.randombit.net/releases/Botan-$Version.tar.xz"
 $BOTAN_UNZIPPED_DIR = "$TEMP_DIR/Botan-$Version"
 $BOTAN_TAR_XZ = "$TEMP_DIR/Botan-$Version.tar.xz"
 $BOTAN_TAR = "$TEMP_DIR/Botan-$Version.tar"
-$EMSCRIPTEN_INSTALL_SCRIPT = "$PSScriptRoot/modules/InsaneEmscripten/X-InsaneEm-InstallEmscripten.ps1"
+$EMSCRIPTEN_INSTALL_SCRIPT = "$PSScriptRoot/submodules/PsEmscripten/X-PsEmscripten-SDK.ps1"
 $VCVARS_SCRIPT = "C:/Program Files/Microsoft Visual Studio/$VisualStudioVersion/Community/VC/Auxiliary/Build/vcvarsall.bat" 
 $VCVARS_X86_SCRIPT = "C:/Program Files/Microsoft Visual Studio/$VisualStudioVersion/Community/VC/Auxiliary/Build/vcvars32.bat" 
 $VCVARS_X64_SCRIPT = "C:/Program Files/Microsoft Visual Studio/$VisualStudioVersion/Community/VC/Auxiliary/Build/vcvars64.bat" 
@@ -257,8 +257,8 @@ function Build-Botan {
         Write-Host
         Push-Location "$PSScriptRoot"
         
-        $null = Test-Command "git submodule init" -ThrowOnFailure
-        $null = Test-Command "git submodule update --remote --recursive" -ThrowOnFailure
+        $null = Test-ExternalCommand -Command "git submodule init" -ThrowOnFailure
+        $null = Test-ExternalCommand -Command "git submodule update --remote --recursive" -ThrowOnFailure
         
         Remove-Item "$EXTRA_WORKING_BUILD_DIR" -Force -Recurse -ErrorAction Ignore
         New-Item "$EXTRA_WORKING_BUILD_DIR" -ItemType Directory -Force | Out-Null
@@ -301,6 +301,7 @@ function Build-Botan {
             Remove-Item "$DestinationDir/$prefix" -Force -Recurse -ErrorAction Ignore
             New-Item "$DestinationDir/$prefix" -ItemType Directory -Force | Out-Null
             & python "$BOTAN_UNZIPPED_DIR/configure.py" $options $BotanOptions
+            & nmake check
             & nmake install
             exit
         }
@@ -346,9 +347,9 @@ function Build-Botan {
 
             Remove-Item "$fullPrefix" -Force -Recurse -ErrorAction Ignore
             New-Item "$fullPrefix" -ItemType Directory -Force | Out-Null
-            & "$EMSCRIPTEN_INSTALL_SCRIPT" -Force
+            & "$EMSCRIPTEN_INSTALL_SCRIPT" -Install
             & $env:EMSCRIPTEN_EMCONFIGURE python "$BOTAN_UNZIPPED_DIR/configure.py" $options $BotanOptions
-            & $env:EMSCRIPTEN_EMMAKE make install
+            & $env:EMSCRIPTEN_EMMAKE make -j8 install EXE_LINK_CMD="$env:EMSCRIPTEN_COMPILER"
             return
         }
         return
