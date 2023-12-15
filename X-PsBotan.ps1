@@ -81,7 +81,9 @@ param (
 )
 
 function Get-BotanVersions {
-    return @("3.2.0") # Update list.
+    $json = [System.IO.File]::ReadAllText($(Get-Item "$PSScriptRoot/BotanVersions.json"))
+    $versions = ConvertFrom-Json $json
+    return $versions
 }
 
 $ErrorActionPreference = "Stop"
@@ -102,7 +104,8 @@ $EMSCRIPTEN_PARAMETER_SETS = @($EMSCRIPTEN_DEBUG_PARAMETER_SET, $EMSCRIPTEN_RELE
 $_7_ZIP_EXE = "C:\Program Files\7-Zip\7z.exe"
 $TEMP_DIR = "$(Get-UserHome)/.PsBotan"
 $Quotes = "`""
-if($Version -notin $(Get-BotanVersions))
+$Versions = @("last") +  (Get-BotanVersions)
+if($Version -notin $Versions)
 {
     throw "Invalid Botan version, valid values are: ""last""$(Get-BotanVersions | ForEach-Object{ Write-Output ", $Quotes$($_)$Quotes" } )"
 }
