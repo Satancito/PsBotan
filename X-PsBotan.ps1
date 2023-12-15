@@ -76,7 +76,6 @@ param (
     [Parameter(ParameterSetName = "Build_VisualCpp_Release", Mandatory = $false)]
     [Parameter(ParameterSetName = "Build_Emscripten_Debug", Mandatory = $false)]
     [Parameter(ParameterSetName = "Build_Emscripten_Release", Mandatory = $false)]
-    [ValidateSet("last", "3.2.0")] # Update list.
     [string]
     $Version = "last"
 )
@@ -102,6 +101,11 @@ $VISUAL_CPP_PARAMETER_SETS = @($VISUAL_CPP_DEBUG_PARAMETER_SET, $VISUAL_CPP_RELE
 $EMSCRIPTEN_PARAMETER_SETS = @($EMSCRIPTEN_DEBUG_PARAMETER_SET, $EMSCRIPTEN_RELEASE_PARAMETER_SET)
 $_7_ZIP_EXE = "C:\Program Files\7-Zip\7z.exe"
 $TEMP_DIR = "$(Get-UserHome)/.PsBotan"
+$Quotes = "`""
+if($Version -notin $(Get-BotanVersions))
+{
+    throw "Invalid Botan version, valid values are: ""last""$(Get-BotanVersions | ForEach-Object{ Write-Output ", $Quotes$($_)$Quotes" } )"
+}
 $Version = ($Version -eq "last" ? (Get-BotanVersions | Select-Object -Last 1) : $Version)
 $BOTAN_URL = "https://botan.randombit.net/releases/Botan-$Version.tar.xz" 
 $BOTAN_UNZIPPED_DIR = "$TEMP_DIR/Botan-$Version"
