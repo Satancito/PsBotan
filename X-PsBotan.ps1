@@ -353,7 +353,15 @@ function Build-Botan {
             New-Item "$fullPrefix" -ItemType Directory -Force | Out-Null
             & "$EMSCRIPTEN_INSTALL_SCRIPT" -Install
             & $env:EMSCRIPTEN_EMCONFIGURE python "$BOTAN_UNZIPPED_DIR/configure.py" $options $BotanOptions
-            & $env:EMSCRIPTEN_EMMAKE make -j8 install EXE_LINK_CMD="$env:EMSCRIPTEN_COMPILER"
+            switch($version)
+            {
+                "3.2.0" {
+                    & $env:EMSCRIPTEN_EMMAKE make -j8 install EXE_LINK_CMD="$env:EMSCRIPTEN_COMPILER"
+                }
+                default {
+                    & $env:EMSCRIPTEN_EMMAKE make -j8 install
+                }
+            }
             return
         }
         return
