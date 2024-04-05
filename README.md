@@ -1,3 +1,3 @@
 # PsBotan
 
-PowerShell script for build Botan in different platforms.
+PowerShell scripts collection for building Botan on different platforms.

@@ -2,3 +2,6 @@
 [submodule "submodules/PsEmscripten"]
 	path = submodules/PsEmscripten
 	url = https://github.com/Satancito/PsEmscripten.git
+[submodule "submodules/PsCoreFxs"]
+	path = submodules/PsCoreFxs
+	url = https://github.com/Satancito/PsCoreFxs

@@ -90,6 +90,9 @@ $ErrorActionPreference = "Stop"
 Import-Module -Name "$(Get-Item "$PSScriptRoot/Z-PsCoreFxs.ps1")" -Force -NoClobber
 Write-InfoDarkGray "▶▶▶ Running: $PSCommandPath"
 
+& git submodule init
+& git submodule update --remote --recursive --force
+
 if ([String]::IsNullOrWhiteSpace($DestinationDir)) {
     $DestinationDir = "$(Get-UserHome)/.CppLibs"
     New-Item -Path $DestinationDir -ItemType Directory -Force | Out-Null
@@ -253,7 +256,8 @@ function Show-BotanModules {
     Write-Host
     Write-InfoBlue "PSBotan - Botan modules list:"
     Write-Host
-    & python "$BOTAN_UNZIPPED_DIR\configure.py" --list-modules
+    $x = & python "$BOTAN_UNZIPPED_DIR\configure.py" --list-modules 
+    $x.GetType().FullName
 }
 
 function Build-Botan {
@@ -352,7 +356,7 @@ function Build-Botan {
             Remove-Item "$fullPrefix" -Force -Recurse -ErrorAction Ignore
             New-Item "$fullPrefix" -ItemType Directory -Force | Out-Null
             & "$EMSCRIPTEN_INSTALL_SCRIPT" -Install
-            & $env:EMSCRIPTEN_EMCONFIGURE python "$BOTAN_UNZIPPED_DIR/configure.py" $options $BotanOptions
+            & $env:EMSCRIPTEN_EMCONFIGURE python "$__BOTAN_EXPANDED_DIR/configure.py" $options $BotanOptions
             switch($version)
             {
                 "3.2.0" {
