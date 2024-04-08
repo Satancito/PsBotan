@@ -26,17 +26,19 @@ param (
     $DestinationDirSuffix = [string]::Empty
 )
 
+$ErrorActionPreference = 'Stop'
+
 Import-Module -Name "$PSScriptRoot/Z-PsBotan.ps1" -Force -NoClobber
 Import-Module -Name "$PSScriptRoot/submodules/PsCoreFxs/Z-PsCoreFxs.ps1" -Force -NoClobber
 
-$DestinationDir = [string]::IsNullOrWhiteSpace($DestinationDir) ? "$__CPP_LIBS_DIR" : $DestinationDir
+$DestinationDir = [string]::IsNullOrWhiteSpace($DestinationDir) ? "$(Get-CppLibsDir)" : $DestinationDir
 
 function Test-WindowsDependencyTools {
     Write-Host
     Write-InfoBlue "PSBotan - Emscripten - Test Windows dependency tools..."
     
     Write-InfoMagenta "== 7Zip"
-    $command = Get-Command "$__7_ZIP_EXE"
+    $command = Get-Command "$__PSCOREFXS_7_ZIP_EXE"
     Write-Host "$($command.Source)"
     & "$($command.Source)" h  "$($command.Source)"
     Write-Host
@@ -57,7 +59,6 @@ function Test-WindowsDependencyTools {
 }
 
 function Test-DependencyTools {
-    Write-Host
     Write-InfoBlue "PSBotan - Emscripten - Test dependency tools..."
     Write-Host
 
@@ -115,12 +116,12 @@ function Build-BotanLibrary {
         Debug   = @{
             Options = @("--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
             Name    = "Debug"
-            Cwd = "$__BOTAN_EXPANDED_DIR/bin/Debug"
+            CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/bin/EmscriptenWasmDebug"
         }
         Release = @{
             Options = @()
             Name    = "Release"
-            Cwd = "$__BOTAN_EXPANDED_DIR/bin/Release"
+            CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/bin/EmscriptenWasmRelease"
         }
     }
     $options = @("--cpu=wasm", "--os=emscripten", "--cc=emcc", "--disable-shared-library")
@@ -128,38 +129,42 @@ function Build-BotanLibrary {
         $options += "--minimized-build"
         $options += "--enable-modules=$($BotanModules -join ",")"
     }
-
+    $options += $BotanOptions
     Test-DependencyTools
     Get-BotanSources
     New-CppLibsDir
-    & "$__EMSCRIPTEN_INSTALL_SCRIPT" -Install
+    
+    Install-EmscriptenSDK
 
     $configurations.Keys | ForEach-Object {
         $configuration = $configurations["$_"]
-        $prefix = "Botan-$__BOTAN_VERSION-Emscripten-Wasm-$($configuration.Name)$DestinationDirSuffix"
+        $prefix = "Botan-$__PSBOTAN_BOTAN_VERSION-Emscripten-Wasm-$($configuration.Name)$DestinationDirSuffix"
         Write-Host
         Write-InfoBlue "█ PsBotan - Building `"$prefix`""
         Write-Host
-        Remove-Item -Path "$prefix" -Force -Recurse -ErrorAction Ignore
+        $prefix = "$DestinationDir/$prefix"
         try {
-            New-Item -Path "$($configuration.Cwd)" -ItemType Directory -Force | Out-Null
-            Push-Location  "$($configuration.Cwd)"
-            & $env:EMSCRIPTEN_EMCONFIGURE python "$__BOTAN_EXPANDED_DIR/configure.py" $configuration.Options $options $BotanOptions --prefix="$DestinationDir/$prefix"
+            New-Item -Path "$($configuration.CurrentWorkingDir)" -ItemType Directory -Force | Out-Null
+            Push-Location  "$($configuration.CurrentWorkingDir)"
+            & $env:EMSCRIPTEN_EMCONFIGURE python "$__PSBOTAN_BOTAN_EXPANDED_DIR/configure.py" $configuration.Options $options --prefix="$prefix"
+            Remove-Item -Path "$prefix" -Force -Recurse -ErrorAction Ignore
             & $env:EMSCRIPTEN_EMMAKE make -j8 install
         }
         finally {
             Pop-Location
+            Remove-Item -Path "$($configuration.CurrentWorkingDir)" -Force -Recurse -ErrorAction Ignore
         }
     }
     
-}
-
-if ($Build.IsPresent -or (!$ListModules.IsPresent)) {
-    Build-BotanLibrary
-    exit
 }
 
 if ($ListModules.IsPresent) {
     Show-BotanModules
     exit
 }
+
+if ($Build.IsPresent -or (!$Build.IsPresent)) {
+    Build-BotanLibrary
+    exit
+}
+
