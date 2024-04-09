@@ -26,6 +26,9 @@ param (
     $DestinationDirSuffix = [string]::Empty
 )
 
+& git submodule init
+& git submodule update --remote --recursive --force
+
 $ErrorActionPreference = 'Stop'
 
 Import-Module -Name "$PSScriptRoot/Z-PsBotan.ps1" -Force -NoClobber

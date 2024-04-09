@@ -1,9 +1,9 @@
+$ErrorActionPreference = 'Stop'
 & git submodule init
-& git submodule update --remote --recursive 
+& git submodule update --remote --recursive --force
 
 Import-Module -Name "$PSScriptRoot/submodules/PsCoreFxs/Z-PsCoreFxs.ps1" -Force -NoClobber
 
-$ErrorActionPreference = 'Stop'
 
 $__PSBOTAN_TEMP_DIR = "$(Get-UserHome)/.PsBotan"
 $__PSBOTAN_BOTAN_VERSION = "3.3.0" # █> Update on next version.
