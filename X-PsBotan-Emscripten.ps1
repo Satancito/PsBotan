@@ -27,9 +27,6 @@ param (
 )
 
 $ErrorActionPreference = 'Stop'
-& git submodule init
-& git submodule update --remote --recursive --force
-
 
 Import-Module -Name "$PSScriptRoot/Z-PsBotan.ps1" -Force -NoClobber
 Import-Module -Name "$PSScriptRoot/submodules/PsCoreFxs/Z-PsCoreFxs.ps1" -Force -NoClobber
