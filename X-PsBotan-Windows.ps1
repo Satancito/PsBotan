@@ -54,37 +54,12 @@ $DestinationDir = [string]::IsNullOrWhiteSpace($DestinationDir) ? "$(Get-CppLibs
 
 function Test-DependencyTools {
     Write-Host
-    Write-InfoBlue "PSBotan - Emscripten - Test Windows dependency tools..."
-    
-    Write-InfoMagenta "== 7Zip"
-    $command = Get-Command "$__PSCOREFXS_7_ZIP_EXE"
-    Write-Host "$($command.Source)"
-    & "$($command.Source)" h  "$($command.Source)"
-    Write-Host
-
-    Write-InfoMagenta "== Python"
-    $command = Get-Command "python"
-    Write-Host "$($command.Source)"
-    & "$($command.Source)" --version
-    Write-Host
-
-    Write-InfoMagenta "== Make"
-    $command = Get-Command "make"
-    Write-Host "$($command.Source)"
-    & "$($command.Source)" --version
-    Write-Host
-
-    Write-InfoMagenta "== Git"
-    $command = Get-Command "git"
-    Write-Host "$($command.Source)"
-    & "$($command.Source)" --version
-    Write-Host
-
-    Write-InfoMagenta "== Ninja"
-    $command = Get-Command "ninja"
-    Write-Host "$($command.Source)"
-    & "$($command.Source)" --version
-    Write-Host
+    Write-InfoBlue "PSBotan - Test dependency tools..."
+    Assert-7ZipExecutable
+    Assert-PythonExecutable
+    Assert-MakeExecutable
+    Assert-GitExecutable
+    Assert-NinjaBuildExecutable
 }
 
 Test-DependencyTools

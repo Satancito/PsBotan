@@ -36,55 +36,20 @@ $DestinationDir = [string]::IsNullOrWhiteSpace($DestinationDir) ? "$(Get-CppLibs
 function Test-WindowsDependencyTools {
     Write-Host
     Write-InfoBlue "PSBotan - Emscripten - Test Windows dependency tools..."
-    
-    Write-InfoMagenta "== 7Zip"
-    $command = Get-Command "$__PSCOREFXS_7_ZIP_EXE"
-    Write-Host "$($command.Source)"
-    & "$($command.Source)" h  "$($command.Source)"
-    Write-Host
-
-    Write-InfoMagenta "== Windows SubSystem for Linux"
-    $command = Get-Command "wsl"
-    Write-Host "$($command.Source)"
-    & "$($command.Source)" --version
-    Write-Host
-
+    Assert-7ZipExecutable
+    Assert-WslExecutable
     if ($ListModules.IsPresent) {
-        Write-InfoMagenta "== Python"
-        $command = Get-Command "python"
-        Write-Host "$($command.Source)"
-        & "$($command.Source)" --version
-        Write-Host
+    Assert-PythonExecutable
     }
 }
 
 function Test-DependencyTools {
     Write-InfoBlue "PSBotan - Emscripten - Test dependency tools..."
     Write-Host
-
-    Write-InfoMagenta "== Tar"
-    $command = Get-Command "tar"
-    Write-Host "$($command.Source)"
-    & "$($command.Source)" h  "$($command.Source)"
-    Write-Host
-
-    Write-InfoMagenta "== Python"
-    $command = Get-Command "python"
-    Write-Host "$($command.Source)"
-    & "$($command.Source)" --version
-    Write-Host
-
-    Write-InfoMagenta "== Make"
-    $command = Get-Command "make"
-    Write-Host "$($command.Source)"
-    & "$($command.Source)" --version
-    Write-Host
-
-    Write-InfoMagenta "== Git"
-    $command = Get-Command "git"
-    Write-Host "$($command.Source)"
-    & "$($command.Source)" --version
-    Write-Host
+    Assert-TarExecutable
+    Assert-PythonExecutable
+    Assert-MakeExecutable
+    Assert-GitExecutable
 }
 
 function Build-BotanLibrary {
