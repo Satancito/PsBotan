@@ -88,9 +88,22 @@ function Build-BotanLibrary {
     New-CppLibsDir
     
     Install-EmscriptenSDK
-
-    $__PSBOTAN_EMSCRIPTEN_BUILD_CONFIGURATIONS.Keys | ForEach-Object {
-        $configuration = $__PSBOTAN_EMSCRIPTEN_BUILD_CONFIGURATIONS["$_"]
+    $configurations = @{
+        Debug   = @{
+            Options           = @("--cpu=wasm", "--os=emscripten", "--cc=emcc", "--disable-shared-library", "--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
+            Name              = "Debug"
+            CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/bin/EmscriptenWasmDebug"
+            DefaultDistDir    = "$(Get-CppLibsDir)/Botan-$__PSBOTAN_BOTAN_VERSION-Emscripten-Wasm-Debug"
+        }
+        Release = @{
+            Options           = @("--cpu=wasm", "--os=emscripten", "--cc=emcc", "--disable-shared-library")
+            Name              = "Release"
+            CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/bin/EmscriptenWasmRelease"
+            DefaultDistDir    = "$(Get-CppLibsDir)/Botan-$__PSBOTAN_BOTAN_VERSION-Emscripten-Wasm-Release"
+        }
+    }
+    $configurations.Keys | ForEach-Object {
+        $configuration = $configurations["$_"]
         $prefix = "Botan-$__PSBOTAN_BOTAN_VERSION-Emscripten-Wasm-$($configuration.Name)$DestinationDirSuffix"
         Write-Host
         Write-InfoBlue "█ PsBotan - Building `"$prefix`""

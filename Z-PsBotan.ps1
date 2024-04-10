@@ -31,19 +31,3 @@ function Show-BotanModules {
     $modules = (& python "$__PSBOTAN_BOTAN_EXPANDED_DIR/configure.py" --list-modules) -join " | "
     Write-Host $modules
 }
-
-$__PSBOTAN_EMSCRIPTEN_BUILD_CONFIGURATIONS = @{
-    Debug   = @{
-        Options           = @("--cpu=wasm", "--os=emscripten", "--cc=emcc", "--disable-shared-library", "--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
-        Name              = "Debug"
-        CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/bin/EmscriptenWasmDebug"
-        DefaultDistDir    = "$(Get-CppLibsDir)/Botan-$__PSBOTAN_BOTAN_VERSION-Emscripten-Wasm-Debug"
-    }
-    Release = @{
-        Options           = @("--cpu=wasm", "--os=emscripten", "--cc=emcc", "--disable-shared-library")
-        Name              = "Release"
-        CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/bin/EmscriptenWasmRelease"
-        DefaultDistDir    = "$(Get-CppLibsDir)/Botan-$__PSBOTAN_BOTAN_VERSION-Emscripten-Wasm-Release"
-    }
-}
-$null = $__PSBOTAN_EMSCRIPTEN_BUILD_CONFIGURATIONS
