@@ -39,7 +39,7 @@ function Test-WindowsDependencyTools {
     Assert-7ZipExecutable
     Assert-WslExecutable
     if ($ListModules.IsPresent) {
-    Assert-PythonExecutable
+        Assert-PythonExecutable
     }
 }
 
@@ -77,19 +77,7 @@ function Build-BotanLibrary {
     
     }
     $DestinationDirSuffix = [string]::IsNullOrWhiteSpace($DestinationDirSuffix) ? [string]::Empty : "-$($DestinationDirSuffix)"
-    $configurations = @{
-        Debug   = @{
-            Options = @("--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
-            Name    = "Debug"
-            CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/bin/EmscriptenWasmDebug"
-        }
-        Release = @{
-            Options = @()
-            Name    = "Release"
-            CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/bin/EmscriptenWasmRelease"
-        }
-    }
-    $options = @("--cpu=wasm", "--os=emscripten", "--cc=emcc", "--disable-shared-library")
+    $options = @()
     if ($BotanModules.Count -gt 0) {
         $options += "--minimized-build"
         $options += "--enable-modules=$($BotanModules -join ",")"
@@ -101,8 +89,8 @@ function Build-BotanLibrary {
     
     Install-EmscriptenSDK
 
-    $configurations.Keys | ForEach-Object {
-        $configuration = $configurations["$_"]
+    $__PSBOTAN_EMSCRIPTEN_BUILD_CONFIGURATIONS.Keys | ForEach-Object {
+        $configuration = $__PSBOTAN_EMSCRIPTEN_BUILD_CONFIGURATIONS["$_"]
         $prefix = "Botan-$__PSBOTAN_BOTAN_VERSION-Emscripten-Wasm-$($configuration.Name)$DestinationDirSuffix"
         Write-Host
         Write-InfoBlue "█ PsBotan - Building `"$prefix`""
