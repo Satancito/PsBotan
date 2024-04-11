@@ -15,13 +15,13 @@ $__PSBOTAN_EMSCRIPTEN_CONFIGURATIONS = @{
     Debug   = @{
         Options           = @("--cpu=wasm", "--os=emscripten", "--cc=emcc", "--disable-shared-library", "--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
         Name              = "Debug"
-        CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/bin/EmscriptenWasmDebug"
+        CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Debug/EmscriptenWasm"
         DistDirName = "Botan-$__PSBOTAN_BOTAN_VERSION-Emscripten-Wasm-Debug"
     }
     Release = @{
         Options           = @("--cpu=wasm", "--os=emscripten", "--cc=emcc", "--disable-shared-library")
         Name              = "Release"
-        CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/bin/EmscriptenWasmRelease"
+        CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Release/EmscriptenWasm"
         DistDirName = "Botan-$__PSBOTAN_BOTAN_VERSION-Emscripten-Wasm-Release"
     }
 }; $null = $__PSBOTAN_EMSCRIPTEN_CONFIGURATIONS
