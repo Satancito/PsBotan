@@ -29,7 +29,6 @@ param (
 $ErrorActionPreference = 'Stop'
 
 Import-Module -Name "$PSScriptRoot/Z-PsBotan.ps1" -Force -NoClobber
-Import-Module -Name "$PSScriptRoot/submodules/PsCoreFxs/Z-PsCoreFxs.ps1" -Force -NoClobber
 
 $DestinationDir = [string]::IsNullOrWhiteSpace($DestinationDir) ? "$(Get-CppLibsDir)" : $DestinationDir
 
