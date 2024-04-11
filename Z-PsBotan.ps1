@@ -11,6 +11,21 @@ $__PSBOTAN_BOTAN_URL = "https://botan.randombit.net/releases/Botan-$__PSBOTAN_BO
 $__PSBOTAN_BOTAN_TAR_XZ_FILE = "$__PSBOTAN_TEMP_DIR/Botan-$__PSBOTAN_BOTAN_VERSION.tar.xz"
 $__PSBOTAN_BOTAN_EXPANDED_DIR = "$__PSBOTAN_TEMP_DIR/Botan-$__PSBOTAN_BOTAN_VERSION"
 
+$__PSBOTAN_EMSCRIPTEN_CONFIGURATIONS = @{
+    Debug   = @{
+        Options           = @("--cpu=wasm", "--os=emscripten", "--cc=emcc", "--disable-shared-library", "--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
+        Name              = "Debug"
+        CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/bin/EmscriptenWasmDebug"
+        DistDirName = "Botan-$__PSBOTAN_BOTAN_VERSION-Emscripten-Wasm-Debug"
+    }
+    Release = @{
+        Options           = @("--cpu=wasm", "--os=emscripten", "--cc=emcc", "--disable-shared-library")
+        Name              = "Release"
+        CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/bin/EmscriptenWasmRelease"
+        DistDirName = "Botan-$__PSBOTAN_BOTAN_VERSION-Emscripten-Wasm-Release"
+    }
+}; $null = $__PSBOTAN_EMSCRIPTEN_CONFIGURATIONS
+
 # █ functions
 
 function Get-BotanSources {
@@ -31,3 +46,4 @@ function Show-BotanModules {
     $modules = (& python "$__PSBOTAN_BOTAN_EXPANDED_DIR/configure.py" --list-modules) -join " | "
     Write-Host $modules
 }
+
