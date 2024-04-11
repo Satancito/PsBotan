@@ -22,7 +22,7 @@ param (
 
     [Parameter(ParameterSetName = "Build_Lib")]
     [string]
-    $DestinationDirSuffix = [string]::Empty,
+    $DistDirSuffix = [string]::Empty,
 
     [Parameter(ParameterSetName = "Build_Lib")]
     [ValidateSet("2022")]
@@ -66,7 +66,7 @@ Get-BotanSources
 New-CppLibsDir
 
 function Build-BotanLibrary {
-    $DestinationDirSuffix = [string]::IsNullOrWhiteSpace($DestinationDirSuffix) ? [string]::Empty : "-$($DestinationDirSuffix)"
+    $DistDirSuffix = [string]::IsNullOrWhiteSpace($DistDirSuffix) ? [string]::Empty : "-$($DistDirSuffix)"
     $configurations = @{
         DebugDesktopX86   = @{
             Options           = @("--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
@@ -136,7 +136,7 @@ function Build-BotanLibrary {
         $configuration.Options += "--cpu=$($configuration.Target)"
         $configuration.Script = "$PSCommandPath"
         $configuration.WorkingDirectory = "$PSScriptRoot"
-        $configuration.DestinationDirSuffix = $DestinationDirSuffix
+        $configuration.DistDirSuffix = $DistDirSuffix
         $configuration.VisualStudioVersion = $VisualStudioVersion
         $configuration.VisualStudioEdition = $VisualStudioEdition
         $configuration.DestinationDir = $DestinationDir
@@ -145,7 +145,7 @@ function Build-BotanLibrary {
             Import-Module -Name "$($configuration.WorkingDirectory)/submodules/PsCoreFxs/Z-PsCoreFxs.ps1" -Force -NoClobber
             Import-Module -Name "$($configuration.WorkingDirectory)/Z-PsBotan.ps1" -Force -NoClobber
             Set-Vcvars -VisualStudioVersion "$($configuration.VisualStudioVersion)" -VisualStudioEdition "$($configuration.VisualStudioEdition)" -Parameters $configuration.VcvarsParameters
-            $prefix = "Botan-$__PSBOTAN_BOTAN_VERSION-Windows-$($configuration.Platform)-$($configuration.Target)-$($configuration.Name)$($configuration.DestinationDirSuffix)"
+            $prefix = "Botan-$__PSBOTAN_BOTAN_VERSION-Windows-$($configuration.Platform)-$($configuration.Target)-$($configuration.Name)$($configuration.DistDirSuffix)"
             Write-Host
             Write-InfoBlue "█ PsBotan - Building `"$prefix`""
             Write-Host

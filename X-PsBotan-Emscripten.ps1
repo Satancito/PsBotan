@@ -23,7 +23,7 @@ param (
 
     [Parameter(ParameterSetName = "Build_Lib")]
     [string]
-    $DestinationDirSuffix = [string]::Empty
+    $DistDirSuffix = [string]::Empty
 )
 
 $ErrorActionPreference = 'Stop'
@@ -59,7 +59,7 @@ function Build-BotanLibrary {
             "BotanModules"         = $BotanModules
             "BotanOptions"         = $BotanOptions
             "DestinationDir"       = (Get-WslPath -Path $DestinationDir)
-            "DestinationDirSuffix" = $DestinationDirSuffix
+            "DistDirSuffix" = $DistDirSuffix
         }
     
         Write-Warning "Incompatible platform: Windows. Using WSL."
@@ -70,12 +70,12 @@ function Build-BotanLibrary {
                 -BotanModules $params.BotanModules `
                 -BotanOptions $params.BotanOptions `
                 -DestinationDir $params.DestinationDir `
-                -DestinationDirSuffix $params.DestinationDirSuffix
+                -DistDirSuffix $params.DistDirSuffix
         } -args $scriptParameters
         return
     
     }
-    $DestinationDirSuffix = [string]::IsNullOrWhiteSpace($DestinationDirSuffix) ? [string]::Empty : "-$($DestinationDirSuffix)"
+    $DistDirSuffix = [string]::IsNullOrWhiteSpace($DistDirSuffix) ? [string]::Empty : "-$($DistDirSuffix)"
     $options = @()
     if ($BotanModules.Count -gt 0) {
         $options += "--minimized-build"
@@ -89,12 +89,12 @@ function Build-BotanLibrary {
     Install-EmscriptenSDK
     $__PSBOTAN_EMSCRIPTEN_CONFIGURATIONS.Keys | ForEach-Object {
         $configuration = $__PSBOTAN_EMSCRIPTEN_CONFIGURATIONS["$_"]
-        Write-Host
-        Write-InfoBlue "█ PsBotan - Building `"$($configuration.DistDirName)`""
-        Write-Host
-        $prefix = "$DestinationDir/$($configuration.DistDirName)"
-        Write-Host "$prefix"
         try {
+            $prefix = "$($configuration.DistDirName)$DistDirSuffix"
+            Write-Host
+            Write-InfoBlue "█ PsBotan - Building `"$($configuration.DistDirName)`""
+            Write-Host
+            $prefix = "$DestinationDir/$prefix"
             New-Item -Path "$($configuration.CurrentWorkingDir)" -ItemType Directory -Force | Out-Null
             Push-Location  "$($configuration.CurrentWorkingDir)"
             & $env:EMSCRIPTEN_EMCONFIGURE python "$__PSBOTAN_BOTAN_EXPANDED_DIR/configure.py" $configuration.Options $options --prefix="$prefix"
