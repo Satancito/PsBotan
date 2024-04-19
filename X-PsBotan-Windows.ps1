@@ -154,10 +154,10 @@ function Build-BotanLibrary {
             try {
                 New-Item -Path "$($configuration.CurrentWorkingDir)" -ItemType Directory -Force | Out-Null
                 Push-Location  "$($configuration.CurrentWorkingDir)"
-                $null = Test-ExternalCommand -Command "python `'$__PSBOTAN_BOTAN_EXPANDED_DIR/configure.py`' $($configuration.Options -join " ") --build-tool=ninja --prefix=$prefix" -ThrowOnFailure -ShowExitCode
-                $null = Test-ExternalCommand -Command "ninja" -ThrowOnFailure -ShowExitCode
+                $null = Test-ExternalCommand -Command "$__PSCOREFXS_PYTHON_EXE `'$__PSBOTAN_BOTAN_EXPANDED_DIR/configure.py`' $($configuration.Options -join " ") --build-tool=ninja --prefix=$prefix" -ThrowOnFailure -ShowExitCode -NoAssertion
+                $null = Test-ExternalCommand -Command "$__PSCOREFXS_NINJA_EXE" -ThrowOnFailure -ShowExitCode -NoAssertion
                 Remove-Item -Path "$prefix" -Force -Recurse -ErrorAction Ignore
-                $null = Test-ExternalCommand -Command "ninja install" -ThrowOnFailure -ShowExitCode
+                $null = Test-ExternalCommand -Command "$__PSCOREFXS_NINJA_EXE install" -ThrowOnFailure -ShowExitCode -NoAssertion
             }
             finally {
                 Pop-Location

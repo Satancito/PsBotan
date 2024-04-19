@@ -5,9 +5,9 @@ Import-Module -Name "$PSScriptRoot/submodules/PsCoreFxs/Z-PsCoreFxs.ps1" -Force 
 
 $__PSBOTAN_TEMP_DIR = "$(Get-UserHome)/.PsBotan"
 $__PSBOTAN_GITHUB_URL = "https://github.com/Satancito/PsBotan.git"; $null = $__PSBOTAN_GITHUB_URL
-$__PSBOTAN_BOTAN_VERSION = "3.3.0" # █> Update on next version.
+$__PSBOTAN_BOTAN_VERSION = "3.4.0" # █> Update on next version.
 $__PSBOTAN_BOTAN_MAJOR_VERSION = "$("$__PSBOTAN_BOTAN_VERSION".Split(".") | Select-Object -First 1)"; $null = $__PSBOTAN_BOTAN_MAJOR_VERSION
-$__PSBOTAN_BOTAN_COMPRESSED_FILE_SHA1 = "F8718BFB7F36446000912C182E14465CE7E65655" # █> Update on next version.
+$__PSBOTAN_BOTAN_COMPRESSED_FILE_SHA1 = "A3E039F019391B0363A38C07044BD92F9CA360CB" # █> Update on next version.
 $__PSBOTAN_BOTAN_URL = "https://botan.randombit.net/releases/Botan-$__PSBOTAN_BOTAN_VERSION.tar.xz" 
 $__PSBOTAN_BOTAN_TAR_XZ_FILE = "$__PSBOTAN_TEMP_DIR/Botan-$__PSBOTAN_BOTAN_VERSION.tar.xz"
 $__PSBOTAN_BOTAN_EXPANDED_DIR = "$__PSBOTAN_TEMP_DIR/Botan-$__PSBOTAN_BOTAN_VERSION"
@@ -28,6 +28,9 @@ $__PSBOTAN_EMSCRIPTEN_CONFIGURATIONS = @{
     }
 }; $null = $__PSBOTAN_EMSCRIPTEN_CONFIGURATIONS
 
+$__PSBOTAN_WINDOWS_CONFIGURATIONS = @{
+
+}; $null = $__PSBOTAN_WINDOWS_CONFIGURATIONS
 # █ functions
 
 function Get-BotanSources {
@@ -45,7 +48,7 @@ function Show-BotanModules {
     Write-Host
     Write-InfoBlue "PSBotan - Botan modules"
     Get-BotanSources
-    $modules = (& python "$__PSBOTAN_BOTAN_EXPANDED_DIR/configure.py" --list-modules) -join " | "
+    $modules = (& $__PSCOREFXS_PYTHON_EXE "$__PSBOTAN_BOTAN_EXPANDED_DIR/configure.py" --list-modules) -join " | "
     Write-Host $modules
 }
 

@@ -97,9 +97,9 @@ function Build-BotanLibrary {
             $prefix = "$DestinationDir/$prefix"
             New-Item -Path "$($configuration.CurrentWorkingDir)" -ItemType Directory -Force | Out-Null
             Push-Location  "$($configuration.CurrentWorkingDir)"
-            & $env:EMSCRIPTEN_EMCONFIGURE python "$__PSBOTAN_BOTAN_EXPANDED_DIR/configure.py" $configuration.Options $options --prefix="$prefix"
+            $null = Test-ExternalCommand -Command "$env:EMSCRIPTEN_EMCONFIGURE $__PSCOREFXS_PYTHON_EXE `"$__PSBOTAN_BOTAN_EXPANDED_DIR/configure.py`" $($configuration.Options) $($options) --prefix=$prefix" -ThrowOnFailure -ShowExitCode -NoAssertion
             Remove-Item -Path "$prefix" -Force -Recurse -ErrorAction Ignore
-            & $env:EMSCRIPTEN_EMMAKE make -j8 install
+            $null = Test-ExternalCommand -Command "$env:EMSCRIPTEN_EMMAKE make -j8 install" -ThrowOnFailure -ShowExitCode -NoAssertion
         }
         finally {
             Pop-Location
