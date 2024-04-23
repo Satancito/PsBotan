@@ -32,12 +32,16 @@ param (
     [Parameter(ParameterSetName = "Build_Lib")]
     [ValidateSet("Community", "Professional", "Enterprise")]
     [string]    
-    $VisualStudioEdition = "Community"
+    $VisualStudioEdition = "Community",
+
+    [switch]
+    [Parameter(ParameterSetName = "Build_Lib")]
+    $ForceDownloadBotan
 )
 
 $ErrorActionPreference = 'Stop'
-
 Import-Module -Name "$PSScriptRoot/Z-PsBotan.ps1" -Force -NoClobber
+$DestinationDir = [string]::IsNullOrWhiteSpace($DestinationDir) ? "$(Get-CppLibsDir)" : $DestinationDir
 
 if (!$IsWindows) {
     Write-Warning "Incompatible platform `"$(Get-OsName)`". Try Another."
@@ -45,11 +49,10 @@ if (!$IsWindows) {
 }
 
 if (!($env:PROCESSOR_ARCHITECTURE -eq "AMD64")) {
-    Write-Warning "Windows x64 operating system is required."
+    Write-Warning "Windows x64 processor architecture is required."
     exit
 }
 
-$DestinationDir = [string]::IsNullOrWhiteSpace($DestinationDir) ? "$(Get-CppLibsDir)" : $DestinationDir
 
 function Test-DependencyTools {
     Write-Host
@@ -62,67 +65,12 @@ function Test-DependencyTools {
 }
 
 Test-DependencyTools
-Get-BotanSources
+Get-BotanSources -Force:$ForceDownloadBotan
 New-CppLibsDir
 
 function Build-BotanLibrary {
     $DistDirSuffix = [string]::IsNullOrWhiteSpace($DistDirSuffix) ? [string]::Empty : "-$($DistDirSuffix)"
-    $configurations = @{
-        DebugDesktopX86   = @{
-            Options           = @("--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
-            Name              = "Debug"
-            Platform          = "Desktop"
-            Target            = "X86"
-            CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/bin/Desktop-X86-Debug"
-            VcvarsParameters  = @("$__PSCOREFXS_VCVARS_ARCH_X86", "-vcvars_spectre_libs=spectre")
-        }
-
-        ReleaseDesktopX86 = @{
-            Options           = @()
-            Name              = "Release"
-            Platform          = "Desktop"
-            Target            = "X86"
-            CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/bin/Desktop-X86-Release"
-            VcvarsParameters  = @("$__PSCOREFXS_VCVARS_ARCH_X86", "-vcvars_spectre_libs=spectre")
-        }
-
-        DebugDesktopX64   = @{
-            Options           = @("--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
-            Name              = "Debug"
-            Platform          = "Desktop"
-            Target            = "X64"
-            CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/bin/Desktop-X64-Debug"
-            VcvarsParameters  = @("$__PSCOREFXS_VCVARS_ARCH_X64", "-vcvars_spectre_libs=spectre")
-        }
-
-        ReleaseDesktopX64 = @{
-            Options           = @()
-            Name              = "Release"
-            Platform          = "Desktop"
-            Target            = "X64"
-            CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/bin/Desktop-X64-Release"
-            VcvarsParameters  = @("$__PSCOREFXS_VCVARS_ARCH_X64", "-vcvars_spectre_libs=spectre")
-        }
-
-        DebugDesktopArm64   = @{
-            Options           = @("--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
-            Name              = "Debug"
-            Platform          = "Desktop"
-            Target            = "Arm64"
-            CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/bin/Desktop-Arm64-Debug"
-            VcvarsParameters  = @("$__PSCOREFXS_VCVARS_ARCH_ARM64", "-vcvars_spectre_libs=spectre")
-        }
-
-        ReleaseDesktopArm64 = @{
-            Options           = @()
-            Name              = "Release"
-            Platform          = "Desktop"
-            Target            = "Arm64"
-            CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/bin/Desktop-Arm64-Release"
-            VcvarsParameters  = @("$__PSCOREFXS_VCVARS_ARCH_ARM64", "-vcvars_spectre_libs=spectre")
-        }
-    }
-
+    
     $options = @("--os=windows", "--cc=msvc")
     if ($BotanModules.Count -gt 0) {
         $options += "--minimized-build"
@@ -130,10 +78,10 @@ function Build-BotanLibrary {
     }
     $options += $BotanOptions
 
-    $configurations.Keys | ForEach-Object {
-        $configuration = $configurations["$_"]
+    $__PSBOTAN_WINDOWS_BUILD_CONFIGURATIONS.Keys | ForEach-Object {
+        $configuration = $__PSBOTAN_WINDOWS_BUILD_CONFIGURATIONS["$_"]
         $configuration.Options += $options
-        $configuration.Options += "--cpu=$($configuration.Target)"
+        $configuration.Options += "--cpu=$($configuration.ConfigureTarget)"
         $configuration.Script = "$PSCommandPath"
         $configuration.WorkingDirectory = "$PSScriptRoot"
         $configuration.DistDirSuffix = $DistDirSuffix
@@ -145,7 +93,7 @@ function Build-BotanLibrary {
             Import-Module -Name "$($configuration.WorkingDirectory)/submodules/PsCoreFxs/Z-PsCoreFxs.ps1" -Force -NoClobber
             Import-Module -Name "$($configuration.WorkingDirectory)/Z-PsBotan.ps1" -Force -NoClobber
             Set-Vcvars -VisualStudioVersion "$($configuration.VisualStudioVersion)" -VisualStudioEdition "$($configuration.VisualStudioEdition)" -Parameters $configuration.VcvarsParameters
-            $prefix = "Botan-$__PSBOTAN_BOTAN_VERSION-Windows-$($configuration.Platform)-$($configuration.Target)-$($configuration.Name)$($configuration.DistDirSuffix)"
+            $prefix = "$($configuration.DistDirName)$($configuration.DistDirSuffix)"
             Write-Host
             Write-InfoBlue "█ PsBotan - Building `"$prefix`""
             Write-Host
@@ -169,7 +117,7 @@ function Build-BotanLibrary {
 
 
 if ($ListModules.IsPresent) {
-    Show-BotanModules
+    Show-BotanModules -Force:$ForceDownloadBotan
     exit
 }
 

@@ -23,11 +23,18 @@ param (
 
     [Parameter(ParameterSetName = "Build_Lib")]
     [string]
-    $DistDirSuffix = [string]::Empty
+    $DistDirSuffix = [string]::Empty,
+
+    [switch]
+    [Parameter(ParameterSetName = "Build_Lib")]
+    $ForceInstallEmscriptenSDK,
+
+    [switch]
+    [Parameter(ParameterSetName = "Build_Lib")]
+    $ForceDownloadBotan
 )
 
 $ErrorActionPreference = 'Stop'
-
 Import-Module -Name "$PSScriptRoot/Z-PsBotan.ps1" -Force -NoClobber
 
 $DestinationDir = [string]::IsNullOrWhiteSpace($DestinationDir) ? "$(Get-CppLibsDir)" : $DestinationDir
@@ -83,12 +90,12 @@ function Build-BotanLibrary {
     }
     $options += $BotanOptions
     Test-DependencyTools
-    Get-BotanSources
+    Get-BotanSources -Force:$ForceDownloadBotan
     New-CppLibsDir
     
-    Install-EmscriptenSDK
-    $__PSBOTAN_EMSCRIPTEN_CONFIGURATIONS.Keys | ForEach-Object {
-        $configuration = $__PSBOTAN_EMSCRIPTEN_CONFIGURATIONS["$_"]
+    Install-EmscriptenSDK -Force:$ForceInstallEmscriptenSDK
+    $__PSBOTAN_EMSCRIPTEN_BUILD_CONFIGURATIONS.Keys | ForEach-Object {
+        $configuration = $__PSBOTAN_EMSCRIPTEN_BUILD_CONFIGURATIONS["$_"]
         try {
             $prefix = "$($configuration.DistDirName)$DistDirSuffix"
             Write-Host
@@ -110,7 +117,7 @@ function Build-BotanLibrary {
 }
 
 if ($ListModules.IsPresent) {
-    Show-BotanModules
+    Show-BotanModules -Force:$ForceDownloadBotan
     exit
 }
 
