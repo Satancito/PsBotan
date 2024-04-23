@@ -138,4 +138,3 @@ if ($Build.IsPresent -or (!$Build.IsPresent)) {
     Build-BotanLibrary
     exit
 }
-throw "Not implemented $PSCommandPath"
