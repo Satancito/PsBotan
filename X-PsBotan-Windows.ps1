@@ -5,10 +5,6 @@ param (
     $ListModules,
 
     [Parameter(ParameterSetName = "Build_Lib")]
-    [switch]
-    $Build, 
-
-    [Parameter(ParameterSetName = "Build_Lib")]
     [string[]]
     $BotanModules = @(),
 
@@ -36,12 +32,16 @@ param (
 
     [switch]
     [Parameter(ParameterSetName = "Build_Lib")]
-    $ForceDownloadBotan
+    $ForceDownloadBotan,
+
+    [Parameter(ParameterSetName = "Remove_Temp")]
+    [switch]
+    $Clean
 )
 
 $ErrorActionPreference = 'Stop'
 Import-Module -Name "$PSScriptRoot/Z-PsBotan.ps1" -Force -NoClobber
-$DestinationDir = [string]::IsNullOrWhiteSpace($DestinationDir) ? "$(Get-CppLibsDir)" : $DestinationDir
+
 
 if (!$IsWindows) {
     Write-Warning "Incompatible platform `"$(Get-OsName)`". Try Another."
@@ -64,11 +64,13 @@ function Test-DependencyTools {
     Assert-NinjaBuildExecutable
 }
 
-Test-DependencyTools
-Get-BotanSources -Force:$ForceDownloadBotan
-New-CppLibsDir
 
 function Build-BotanLibrary {
+    $DestinationDir = [string]::IsNullOrWhiteSpace($DestinationDir) ? "$(Get-CppLibsDir)" : $DestinationDir
+    Test-DependencyTools
+    Get-BotanSources -Force:$ForceDownloadBotan
+    New-CppLibsDir
+
     $DistDirSuffix = [string]::IsNullOrWhiteSpace($DistDirSuffix) ? [string]::Empty : "-$($DistDirSuffix)"
     
     $options = @("--os=windows", "--cc=msvc")
@@ -119,9 +121,12 @@ if ($ListModules.IsPresent) {
     exit
 }
 
-if ($Build.IsPresent -or !$Build.IsPresent) {
-    Build-BotanLibrary
+if ($Clean.IsPresent) {
+    Remove-PsBotan
     exit
 }
+
+Build-BotanLibrary
+exit
 
 

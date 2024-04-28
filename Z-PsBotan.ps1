@@ -196,3 +196,28 @@ function Show-BotanModules {
     Write-Host $modules
 }
 
+function Remove-PsBotan {
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [switch]
+        $RemoveWsl
+    )
+    Write-InfoBlue "Removing PsBotan"
+    Write-Host "$__PSBOTAN_TEMP_DIR"
+    Remove-Item -Path "$__PSBOTAN_TEMP_DIR" -Force -Recurse -ErrorAction Ignore
+    if($IsWindows -and $RemoveWsl.IsPresent)
+    {
+        $scriptParameters = @{
+            "Script" = (Get-WslPath -Path "$PSCommandPath")
+        }
+
+        Write-Host "Removing in WSL."
+        & wsl pwsh -Command {
+            $params = $args[0]
+            Write-Host "Wsl User: " -NoNewline ; & whoami
+            Import-Module -Name "$($params.Script)" -Force -NoClobber
+            Remove-PsBotan
+        } -args $scriptParameters
+    }
+}

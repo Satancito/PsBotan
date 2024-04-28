@@ -5,10 +5,6 @@ param (
     $ListModules,
 
     [Parameter(ParameterSetName = "Build_Lib")]
-    [switch]
-    $Build, 
-
-    [Parameter(ParameterSetName = "Build_Lib")]
     [string[]]
     $BotanModules = @(),
 
@@ -31,13 +27,15 @@ param (
 
     [switch]
     [Parameter(ParameterSetName = "Build_Lib")]
-    $ForceDownloadBotan
+    $ForceDownloadBotan,
+
+    [Parameter(ParameterSetName = "Remove_Temp")]
+    [switch]
+    $Clean
 )
 
 $ErrorActionPreference = 'Stop'
 Import-Module -Name "$PSScriptRoot/Z-PsBotan.ps1" -Force -NoClobber
-
-$DestinationDir = [string]::IsNullOrWhiteSpace($DestinationDir) ? "$(Get-CppLibsDir)" : $DestinationDir
 
 function Test-WindowsDependencyTools {
     Write-Host
@@ -59,14 +57,15 @@ function Test-DependencyTools {
 }
 
 function Build-BotanLibrary {
+    $DestinationDir = [string]::IsNullOrWhiteSpace($DestinationDir) ? "$(Get-CppLibsDir)" : $DestinationDir
     if ($IsWindows) {
         Test-WindowsDependencyTools
         $scriptParameters = @{
-            "Script"               = (Get-WslPath -Path "$PSCommandPath")
-            "BotanModules"         = $BotanModules
-            "BotanOptions"         = $BotanOptions
-            "DestinationDir"       = (Get-WslPath -Path $DestinationDir)
-            "DistDirSuffix" = $DistDirSuffix
+            "Script"         = (Get-WslPath -Path "$PSCommandPath")
+            "BotanModules"   = $BotanModules
+            "BotanOptions"   = $BotanOptions
+            "DestinationDir" = (Get-WslPath -Path $DestinationDir)
+            "DistDirSuffix"  = $DistDirSuffix
         }
     
         Write-Warning "Incompatible platform: Windows. Using WSL."
@@ -120,8 +119,12 @@ if ($ListModules.IsPresent) {
     exit
 }
 
-if ($Build.IsPresent -or (!$Build.IsPresent)) {
-    Build-BotanLibrary
+if ($Clean.IsPresent) {
+    Remove-PsBotan -RemoveWsl
     exit
 }
+
+Build-BotanLibrary
+exit
+
 
