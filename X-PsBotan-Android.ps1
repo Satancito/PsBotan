@@ -24,8 +24,7 @@ param (
     [string]
     $DistDirSuffix = [string]::Empty,
 
-    [Parameter()]
-    [ValidateSet(21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34)]
+    [Parameter(ParameterSetName = "Build_Lib")]
     [string]
     $AndroidAPI = "34",
 
@@ -40,6 +39,12 @@ param (
 
 $ErrorActionPreference = 'Stop'
 Import-Module -Name "$PSScriptRoot/Z-PsBotan.ps1" -Force -NoClobber
+
+if ([string]::IsNullOrWhiteSpace($AndroidAPI)) {
+    $AndroidAPI = [AndroidNDKApiValidateSet]::ValidValues | Select-Object -Last 1
+}
+
+Assert-AndroidNDKApi -Api $AndroidAPI
 
 $DestinationDir = [string]::IsNullOrWhiteSpace($DestinationDir) ? "$(Get-CppLibsDir)" : $DestinationDir
 
