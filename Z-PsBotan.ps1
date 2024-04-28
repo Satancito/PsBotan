@@ -101,7 +101,7 @@ $__PSBOTAN_ANDROID_BUILD_CONFIGURATIONS = [ordered]@{
         Triplet           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Triplet)"
         Options           = @( "--os=android", "--cc=clang", "--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Debug/Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Name)"
-        DistDirName       = "Botan-$__PSBOTAN_BOTAN_VERSION-Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Name)-Debug"     
+        DistDirName       = "Botan-$__PSBOTAN_BOTAN_VERSION-Android-Api{0}-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Name)-Debug"     
     }
     "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Name)-Debug"   = @{ 
         Name              = "Debug"
@@ -110,7 +110,7 @@ $__PSBOTAN_ANDROID_BUILD_CONFIGURATIONS = [ordered]@{
         Triplet           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Triplet)"
         Options           = @( "--os=android", "--cc=clang", "--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Debug/Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Name)"
-        DistDirName       = "Botan-$__PSBOTAN_BOTAN_VERSION-Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Name)-Debug"     
+        DistDirName       = "Botan-$__PSBOTAN_BOTAN_VERSION-Android-Api{0}-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Name)-Debug"     
     }
     "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Name)-Debug"     = @{ 
         Name              = "Debug"
@@ -119,7 +119,7 @@ $__PSBOTAN_ANDROID_BUILD_CONFIGURATIONS = [ordered]@{
         Triplet           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Triplet)"
         Options           = @("--os=android", "--cc=clang", "--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Debug/Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Name)"
-        DistDirName       = "Botan-$__PSBOTAN_BOTAN_VERSION-Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Name)-Debug"   
+        DistDirName       = "Botan-$__PSBOTAN_BOTAN_VERSION-Android-Api{0}-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Name)-Debug"   
     }
     "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Name)-Debug"     = @{ 
         Name              = "Debug"
@@ -128,7 +128,7 @@ $__PSBOTAN_ANDROID_BUILD_CONFIGURATIONS = [ordered]@{
         Triplet           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Triplet)"
         Options           = @("--os=android", "--cc=clang", "--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Debug/Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Name)"
-        DistDirName       = "Botan-$__PSBOTAN_BOTAN_VERSION-Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Name)-Debug"   
+        DistDirName       = "Botan-$__PSBOTAN_BOTAN_VERSION-Android-Api{0}-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Name)-Debug"   
     }
 
     "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Name)-Release"   = @{ 
@@ -138,7 +138,7 @@ $__PSBOTAN_ANDROID_BUILD_CONFIGURATIONS = [ordered]@{
         Triplet           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Triplet)"
         Options           = @("--os=android", "--cc=clang")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Release/Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Name)"
-        DistDirName       = "Botan-$__PSBOTAN_BOTAN_VERSION-Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Name)-Release"
+        DistDirName       = "Botan-$__PSBOTAN_BOTAN_VERSION-Android-Api{0}-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Name)-Release"
     }
     "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Name)-Release" = @{ 
         Name              = "Release"
@@ -147,7 +147,7 @@ $__PSBOTAN_ANDROID_BUILD_CONFIGURATIONS = [ordered]@{
         Triplet           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Triplet)" 
         Options           = @("--os=android", "--cc=clang")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Release/Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Name)"
-        DistDirName       = "Botan-$__PSBOTAN_BOTAN_VERSION-Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Name)-Release" 
+        DistDirName       = "Botan-$__PSBOTAN_BOTAN_VERSION-Android-Api{0}-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Name)-Release" 
     }
     "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Name)-Release"   = @{ 
         Name              = "Release"
@@ -156,7 +156,7 @@ $__PSBOTAN_ANDROID_BUILD_CONFIGURATIONS = [ordered]@{
         Triplet           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Triplet)"
         Options           = @("--os=android", "--cc=clang")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Release/Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Name)"
-        DistDirName       = "Botan-$__PSBOTAN_BOTAN_VERSION-Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Name)-Release" 
+        DistDirName       = "Botan-$__PSBOTAN_BOTAN_VERSION-Android-Api{0}-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Name)-Release" 
     }
     "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Name)-Release"   = @{ 
         Name              = "Release"
@@ -165,7 +165,7 @@ $__PSBOTAN_ANDROID_BUILD_CONFIGURATIONS = [ordered]@{
         Triplet           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Triplet)"
         Options           = @("--os=android", "--cc=clang")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Release/Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Name)"
-        DistDirName       = "Botan-$__PSBOTAN_BOTAN_VERSION-Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Name)-Release"  
+        DistDirName       = "Botan-$__PSBOTAN_BOTAN_VERSION-Android-Api{0}-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Name)-Release"  
     }
 }; $null = $__PSBOTAN_ANDROID_BUILD_CONFIGURATIONS
 

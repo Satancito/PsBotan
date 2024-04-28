@@ -108,7 +108,7 @@ function Build-BotanLibrary {
     $__PSBOTAN_ANDROID_BUILD_CONFIGURATIONS.Keys | ForEach-Object {
         $configuration = $__PSBOTAN_ANDROID_BUILD_CONFIGURATIONS["$_"]
         try {
-            $prefix = "$DestinationDir/$($configuration.DistDirName.Replace("-Android-", "-Android-Api$AndroidAPI-"))$DistDirSuffix"
+            $prefix = "$DestinationDir/$([string]::Format( $configuration.DistDirName, $AndroidAPI))$DistDirSuffix"
             Write-Host
             Write-InfoBlue "█ PsBotan - Building `"$prefix`""
             Write-Host
