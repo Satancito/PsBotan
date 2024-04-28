@@ -97,11 +97,10 @@ function Build-BotanLibrary {
     $__PSBOTAN_EMSCRIPTEN_BUILD_CONFIGURATIONS.Keys | ForEach-Object {
         $configuration = $__PSBOTAN_EMSCRIPTEN_BUILD_CONFIGURATIONS["$_"]
         try {
-            $prefix = "$($configuration.DistDirName)$DistDirSuffix"
+            $prefix = "$DestinationDir/$($configuration.DistDirName)$DistDirSuffix"
             Write-Host
             Write-InfoBlue "█ PsBotan - Building `"$($configuration.DistDirName)`""
             Write-Host
-            $prefix = "$DestinationDir/$prefix"
             New-Item -Path "$($configuration.CurrentWorkingDir)" -ItemType Directory -Force | Out-Null
             Push-Location  "$($configuration.CurrentWorkingDir)"
             $null = Test-ExternalCommand -Command "$env:EMSCRIPTEN_EMCONFIGURE $__PSCOREFXS_PYTHON_EXE `"$__PSBOTAN_BOTAN_EXPANDED_DIR/configure.py`" $($configuration.Options) $($options) --prefix=$prefix" -ThrowOnFailure -ShowExitCode -NoAssertion

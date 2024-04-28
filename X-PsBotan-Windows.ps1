@@ -93,12 +93,10 @@ function Build-BotanLibrary {
             Import-Module -Name "$($configuration.WorkingDirectory)/submodules/PsCoreFxs/Z-PsCoreFxs.ps1" -Force -NoClobber
             Import-Module -Name "$($configuration.WorkingDirectory)/Z-PsBotan.ps1" -Force -NoClobber
             Set-Vcvars -VisualStudioVersion "$($configuration.VisualStudioVersion)" -VisualStudioEdition "$($configuration.VisualStudioEdition)" -Parameters $configuration.VcvarsParameters
-            $prefix = "$($configuration.DistDirName)$($configuration.DistDirSuffix)"
+            $prefix = "$($configuration.DestinationDir)/$($configuration.DistDirName)$($configuration.DistDirSuffix)"
             Write-Host
             Write-InfoBlue "█ PsBotan - Building `"$prefix`""
             Write-Host
-
-            $prefix = "$($configuration.DestinationDir)/$prefix"
             try {
                 New-Item -Path "$($configuration.CurrentWorkingDir)" -ItemType Directory -Force | Out-Null
                 Push-Location  "$($configuration.CurrentWorkingDir)"
