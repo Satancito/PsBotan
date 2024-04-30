@@ -29,7 +29,7 @@ param (
     [Parameter(ParameterSetName = "Build_Lib")]
     $ForceDownloadBotan,
 
-    [Parameter(ParameterSetName = "Remove_Temp")]
+    [Parameter(Mandatory=$true, ParameterSetName = "Remove_Temp")]
     [switch]
     $Clean
 )
@@ -72,7 +72,7 @@ function Build-BotanLibrary {
         & wsl pwsh -Command {
             $params = $args[0]
             Write-Host "Wsl User: " -NoNewline ; & whoami
-            & "$($params.Script)" -Build `
+            & "$($params.Script)" `
                 -BotanModules $params.BotanModules `
                 -BotanOptions $params.BotanOptions `
                 -DestinationDir $params.DestinationDir `

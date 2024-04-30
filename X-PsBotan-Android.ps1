@@ -22,7 +22,7 @@ param (
 
     [Parameter(ParameterSetName = "Build_Lib")]
     [string]
-    $AndroidAPI = "34",
+    $AndroidAPI,
 
     [switch]
     [Parameter(ParameterSetName = "Build_Lib")]
@@ -32,7 +32,7 @@ param (
     [Parameter(ParameterSetName = "Build_Lib")]
     $ForceDownloadBotan,
 
-    [Parameter(ParameterSetName = "Remove_Temp")]
+    [Parameter(Mandatory = $true, ParameterSetName = "Remove_Temp")]
     [switch]
     $Clean
 )
@@ -84,7 +84,7 @@ function Build-BotanLibrary {
         & wsl pwsh -Command {
             $params = $args[0]
             Write-Host "Wsl User: " -NoNewline ; & whoami
-            & "$($params.Script)" -Build `
+            & "$($params.Script)" `
                 -BotanModules $params.BotanModules `
                 -BotanOptions $params.BotanOptions `
                 -DestinationDir $params.DestinationDir `
@@ -112,7 +112,7 @@ function Build-BotanLibrary {
     $__PSBOTAN_ANDROID_BUILD_CONFIGURATIONS.Keys | ForEach-Object {
         $configuration = $__PSBOTAN_ANDROID_BUILD_CONFIGURATIONS["$_"]
         try {
-            $prefix = "$DestinationDir/$([string]::Format( $configuration.DistDirName, $AndroidAPI))$DistDirSuffix"
+            $prefix = "$DestinationDir/$($configuration.DistDirName -f @($AndroidAPI))$DistDirSuffix"
             Write-Host
             Write-InfoBlue "█ PsBotan - Building `"$prefix`""
             Write-Host
@@ -120,9 +120,9 @@ function Build-BotanLibrary {
             Push-Location  "$($configuration.CurrentWorkingDir)"
             $env:CXX = "$($androidNdkVariant.ToolchainsDir)/bin/$($configuration.Triplet)$AndroidAPI-$__PSCOREFXS_ANDROID_NDK_CLANG_PLUS_PLUS_EXE_SUFFIX"
             $env:AR = "$($androidNdkVariant.ToolchainsDir)/bin/$__PSCOREFXS_ANDROID_NDK_AR_EXE"
-            $null = Test-ExternalCommand -Command "$__PSCOREFXS_PYTHON_EXE `"$__PSBOTAN_BOTAN_EXPANDED_DIR/configure.py`" --cpu=$($configuration.Abi) $($configuration.Options) $($options) --prefix=$prefix" -ThrowOnFailure -ShowExitCode -NoAssertion
+            $null = Test-ExternalCommand -Command "`"$__PSCOREFXS_PYTHON_EXE`" `"$__PSBOTAN_BOTAN_EXPANDED_DIR/configure.py`" $($configuration.Options) $($options) --prefix=$prefix" -ThrowOnFailure -ShowExitCode -NoAssertion
             Remove-Item -Path "$prefix" -Force -Recurse -ErrorAction Ignore
-            $null = Test-ExternalCommand -Command "$env:EMSCRIPTEN_EMMAKE make -j8 install" -ThrowOnFailure -ShowExitCode -NoAssertion
+            $null = Test-ExternalCommand -Command "$env:EMSCRIPTEN_EMMAKE `"$__PSCOREFXS_MAKE_EXE`" install" -ThrowOnFailure -ShowExitCode -NoAssertion
         }
         finally {
             Pop-Location

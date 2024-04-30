@@ -34,7 +34,7 @@ param (
     [Parameter(ParameterSetName = "Build_Lib")]
     $ForceDownloadBotan,
 
-    [Parameter(ParameterSetName = "Remove_Temp")]
+    [Parameter(Mandatory = $true,ParameterSetName = "Remove_Temp")]
     [switch]
     $Clean
 )
@@ -83,7 +83,6 @@ function Build-BotanLibrary {
     $__PSBOTAN_WINDOWS_BUILD_CONFIGURATIONS.Keys | ForEach-Object {
         $configuration = $__PSBOTAN_WINDOWS_BUILD_CONFIGURATIONS["$_"]
         $configuration.Options += $options
-        $configuration.Options += "--cpu=$($configuration.ConfigureTarget)"
         $configuration.Script = "$PSCommandPath"
         $configuration.WorkingDirectory = "$PSScriptRoot"
         $configuration.DistDirSuffix = $DistDirSuffix
@@ -102,10 +101,10 @@ function Build-BotanLibrary {
             try {
                 New-Item -Path "$($configuration.CurrentWorkingDir)" -ItemType Directory -Force | Out-Null
                 Push-Location  "$($configuration.CurrentWorkingDir)"
-                $null = Test-ExternalCommand -Command "$__PSCOREFXS_PYTHON_EXE `'$__PSBOTAN_BOTAN_EXPANDED_DIR/configure.py`' $($configuration.Options -join " ") --build-tool=ninja --prefix=$prefix" -ThrowOnFailure -ShowExitCode -NoAssertion
-                $null = Test-ExternalCommand -Command "$__PSCOREFXS_NINJA_EXE" -ThrowOnFailure -ShowExitCode -NoAssertion
+                $null = Test-ExternalCommand -Command "`"$__PSCOREFXS_PYTHON_EXE`" `'$__PSBOTAN_BOTAN_EXPANDED_DIR/configure.py`' $($configuration.Options -join " ") --build-tool=ninja --prefix=$prefix" -ThrowOnFailure -ShowExitCode -NoAssertion
+                $null = Test-ExternalCommand -Command "`"$__PSCOREFXS_NINJA_EXE`"" -ThrowOnFailure -ShowExitCode -NoAssertion
                 Remove-Item -Path "$prefix" -Force -Recurse -ErrorAction Ignore
-                $null = Test-ExternalCommand -Command "$__PSCOREFXS_NINJA_EXE install" -ThrowOnFailure -ShowExitCode -NoAssertion
+                $null = Test-ExternalCommand -Command "`"$__PSCOREFXS_NINJA_EXE`" install" -ThrowOnFailure -ShowExitCode -NoAssertion
             }
             finally {
                 Pop-Location
