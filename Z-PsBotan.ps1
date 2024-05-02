@@ -20,143 +20,143 @@ $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT = @{
 
 # MARK: █ Emscripten build configurations
 $__PSBOTAN_EMSCRIPTEN_BUILD_CONFIGURATIONS = [ordered]@{
-    Debug   = @{
-        Name              = "Debug"
+    $__PSCOREFXS_EMSCRIPTEN_CONFIGURATIONS.Wasm.NameDebug   = [ordered]@{
+        Name              = $__PSCOREFXS_DEBUG_CONFIGURATION
         Options           = @("--cpu=wasm", "--os=emscripten", "--cc=emcc", "--disable-shared-library", "--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
-        CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Debug/EmscriptenWasm"
-        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.Emscripten -f @("Debug")
+        CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Debug/Emscripten-Wasm"
+        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.Emscripten -f @($__PSCOREFXS_DEBUG_CONFIGURATION)
     }
-    Release = @{
-        Name              = "Release"
+    $__PSCOREFXS_EMSCRIPTEN_CONFIGURATIONS.Wasm.NameRelease = [ordered]@{
+        Name              = $__PSCOREFXS_RELEASE_CONFIGURATION
         Options           = @("--cpu=wasm", "--os=emscripten", "--cc=emcc", "--disable-shared-library")
-        CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Release/EmscriptenWasm"
-        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.Emscripten -f @("Release")
+        CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Release/Emscripten-Wasm"
+        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.Emscripten -f @($__PSCOREFXS_RELEASE_CONFIGURATION)
     }
 }; $null = $__PSBOTAN_EMSCRIPTEN_BUILD_CONFIGURATIONS
 
 # MARK: █ Windows build configurations
 $__PSBOTAN_WINDOWS_BUILD_CONFIGURATIONS = [ordered]@{
-    DebugDesktopX86     = @{
-        Name              = "Debug"
+    $($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.X86.NameDebug )     = [ordered]@{
+        Name              = $__PSCOREFXS_DEBUG_CONFIGURATION
         Platform          = "Desktop"
         Options           = @("--cpu=X86", "--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Debug/Windows-Desktop-$($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.X86.Name)"
         VcvarsParameters  = @("$($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.X86.VcVarsArch)", "$__PSCOREFXS_VCVARS_SPECTRE_MODE_PARAMETER")
-        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.WindowsDesktop -f @($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.X86.Name, "Debug")
+        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.WindowsDesktop -f @($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.X86.Name, $__PSCOREFXS_DEBUG_CONFIGURATION)
     }
 
-    DebugDesktopX64     = @{
-        Name              = "Debug"
+    $($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.X64.NameDebug )     = [ordered]@{
+        Name              = $__PSCOREFXS_DEBUG_CONFIGURATION
         Platform          = "Desktop"
         Options           = @("--cpu=X64", "--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Debug/Windows-Desktop-$($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.X64.Name)"
         VcvarsParameters  = @("$($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.X64.VcVarsArch)", "$__PSCOREFXS_VCVARS_SPECTRE_MODE_PARAMETER")
-        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.WindowsDesktop -f @($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.X64.Name, "Debug")
+        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.WindowsDesktop -f @($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.X64.Name, $__PSCOREFXS_DEBUG_CONFIGURATION)
     }
 
-    DebugDesktopArm64   = @{
-        Name              = "Debug"
+    $($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.Arm64.NameDebug )   = [ordered]@{
+        Name              = $__PSCOREFXS_DEBUG_CONFIGURATION
         Platform          = "Desktop"
         Options           = @("--cpu=Arm64", "--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Debug/Windows-Desktop-$($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.Arm64.Name)"
         VcvarsParameters  = @("$($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.Arm64.VcVarsArch)", "$__PSCOREFXS_VCVARS_SPECTRE_MODE_PARAMETER")
-        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.WindowsDesktop -f @($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.Arm64.Name, "Debug")
+        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.WindowsDesktop -f @($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.Arm64.Name, $__PSCOREFXS_DEBUG_CONFIGURATION)
     }
 
-    ReleaseDesktopX86   = @{
-        Name              = "Release"
+    $($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.X86.NameRelease )   = [ordered]@{
+        Name              = $__PSCOREFXS_RELEASE_CONFIGURATION
         Platform          = "Desktop"
         Options           = @("--cpu=X86")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Release/Windows-Desktop-$($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.X86.Name)"
         VcvarsParameters  = @("$($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.X86.VcVarsArch)", "$__PSCOREFXS_VCVARS_SPECTRE_MODE_PARAMETER")
-        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.WindowsDesktop -f @($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.X86.Name, "Release")
+        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.WindowsDesktop -f @($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.X86.Name, $__PSCOREFXS_RELEASE_CONFIGURATION)
     }
     
-    ReleaseDesktopX64   = @{
-        Name              = "Release"
+    $($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.X64.NameRelease )   = [ordered]@{
+        Name              = $__PSCOREFXS_RELEASE_CONFIGURATION
         Platform          = "Desktop"
         Options           = @("--cpu=X64")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Release/Windows-Desktop-$($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.X64.Name)"
         VcvarsParameters  = @("$($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.X64.VcVarsArch)", "$__PSCOREFXS_VCVARS_SPECTRE_MODE_PARAMETER")
-        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.WindowsDesktop -f @($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.X64.Name, "Release")
+        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.WindowsDesktop -f @($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.X64.Name, $__PSCOREFXS_RELEASE_CONFIGURATION)
     }
 
-    ReleaseDesktopArm64 = @{
-        Name              = "Release"
+    $($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.Arm64.NameRelease ) = [ordered]@{
+        Name              = $__PSCOREFXS_RELEASE_CONFIGURATION
         Platform          = "Desktop"
         Options           = @("--cpu=Arm64")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Release/Windows-Desktop-$($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.Arm64.Name)"
         VcvarsParameters  = @("$($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.Arm64.VcVarsArch)", "$__PSCOREFXS_VCVARS_SPECTRE_MODE_PARAMETER")
-        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.WindowsDesktop -f @($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.Arm64.Name, "Release")
+        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.WindowsDesktop -f @($__PSCOREFXS_WINDOWS_ARCH_CONFIGURATIONS.Arm64.Name, $__PSCOREFXS_RELEASE_CONFIGURATION)
     }
 }; $null = $__PSBOTAN_WINDOWS_BUILD_CONFIGURATIONS
 
 # MARK: █ Android build configurations
 $__PSBOTAN_ANDROID_BUILD_CONFIGURATIONS = [ordered]@{
-    "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Name)-Debug"     = @{ 
-        Name              = "Debug"
+    $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.NameDebug     = [ordered]@{ 
+        Name              = $__PSCOREFXS_DEBUG_CONFIGURATION
         AbiName           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Name)"
         Triplet           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Triplet)"
         Options           = @("--cpu=$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Abi)", "--os=android", "--cc=clang", "--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Debug/Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Name)"
-        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.Android -f @("{0}", $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Name, "Debug")
+        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.Android -f @("{0}", $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Name, $__PSCOREFXS_DEBUG_CONFIGURATION)
     }
-    "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Name)-Debug"   = @{ 
-        Name              = "Debug"
+    $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.NameDebug   = [ordered]@{ 
+        Name              = $__PSCOREFXS_DEBUG_CONFIGURATION
         AbiName           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Name)"
         Triplet           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Triplet)"
         Options           = @("--cpu=$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Abi)", "--os=android", "--cc=clang", "--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Debug/Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Name)"
-        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.Android -f @("{0}", $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Name, "Debug")
+        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.Android -f @("{0}", $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Name, $__PSCOREFXS_DEBUG_CONFIGURATION)
     }
-    "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Name)-Debug"     = @{ 
-        Name              = "Debug"
+    $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.NameDebug     = [ordered]@{ 
+        Name              = $__PSCOREFXS_DEBUG_CONFIGURATION
         AbiName           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Name)"
         Triplet           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Triplet)"
         Options           = @("--cpu=$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Abi)", "--os=android", "--cc=clang", "--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Debug/Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Name)"
-        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.Android -f @("{0}", $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Name, "Debug")
+        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.Android -f @("{0}", $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Name, $__PSCOREFXS_DEBUG_CONFIGURATION)
     }
-    "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Name)-Debug"     = @{ 
-        Name              = "Debug"
+    $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.NameDebug     = [ordered]@{ 
+        Name              = $__PSCOREFXS_DEBUG_CONFIGURATION
         AbiName           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Name)"
         Triplet           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Triplet)"
         Options           = @("--cpu=$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Abi)", "--os=android", "--cc=clang", "--debug-mode", "--with-debug-info", "--no-optimizations", "--link-method=copy")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Debug/Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Name)"
-        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.Android -f @("{0}", $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Name, "Debug") 
+        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.Android -f @("{0}", $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Name, $__PSCOREFXS_DEBUG_CONFIGURATION) 
     }
 
-    "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Name)-Release"   = @{ 
-        Name              = "Release"
+    $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.NameRelease   = [ordered]@{ 
+        Name              = $__PSCOREFXS_RELEASE_CONFIGURATION
         AbiName           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Name)"
         Triplet           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Triplet)"
         Options           = @("--cpu=$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Abi)", "--os=android", "--cc=clang")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Release/Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Name)"
-        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.Android -f @("{0}", $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Name, "Release")
+        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.Android -f @("{0}", $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm.Name, $__PSCOREFXS_RELEASE_CONFIGURATION)
     }
-    "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Name)-Release" = @{ 
-        Name              = "Release"
+    $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.NameRelease = [ordered]@{ 
+        Name              = $__PSCOREFXS_RELEASE_CONFIGURATION
         AbiName           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Name)"
         Triplet           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Triplet)" 
         Options           = @("--cpu=$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Abi)", "--os=android", "--cc=clang")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Release/Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Name)"
-        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.Android -f @("{0}", $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Name, "Release")
+        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.Android -f @("{0}", $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.Arm64.Name, $__PSCOREFXS_RELEASE_CONFIGURATION)
     }
-    "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Name)-Release"   = @{ 
-        Name              = "Release"
+    $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.NameRelease   = [ordered]@{ 
+        Name              = $__PSCOREFXS_RELEASE_CONFIGURATION
         AbiName           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Name)"
         Triplet           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Triplet)"
-        Options           = @("--cpu=$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Abi)","--os=android", "--cc=clang")
+        Options           = @("--cpu=$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Abi)", "--os=android", "--cc=clang")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Release/Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Name)"
-        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.Android -f @("{0}", $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Name, "Release")
+        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.Android -f @("{0}", $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X86.Name, $__PSCOREFXS_RELEASE_CONFIGURATION)
     }
-    "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Name)-Release"   = @{ 
-        Name              = "Release"
+    $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.NameRelease   = [ordered]@{ 
+        Name              = $__PSCOREFXS_RELEASE_CONFIGURATION
         AbiName           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Name)"
         Triplet           = "$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Triplet)"
         Options           = @("--cpu=$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Abi)", "--os=android", "--cc=clang")
         CurrentWorkingDir = "$__PSBOTAN_BOTAN_EXPANDED_DIR/Bin/Release/Android-$($__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Name)"
-        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.Android -f @("{0}", $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Name, "Release")
+        DistDirName       = $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT.Android -f @("{0}", $__PSCOREFXS_ANDROIDNDK_ANDROID_ABI_CONFIGURATIONS.X64.Name, $__PSCOREFXS_RELEASE_CONFIGURATION)
     }
 }; $null = $__PSBOTAN_ANDROID_BUILD_CONFIGURATIONS
 
