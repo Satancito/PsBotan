@@ -12,7 +12,7 @@ $__PSBOTAN_BOTAN_URL = "https://botan.randombit.net/releases/Botan-$__PSBOTAN_BO
 $__PSBOTAN_BOTAN_TAR_XZ_FILE = "$__PSBOTAN_TEMP_DIR/Botan-$__PSBOTAN_BOTAN_VERSION.tar.xz"
 $__PSBOTAN_BOTAN_EXPANDED_DIR = "$__PSBOTAN_TEMP_DIR/Botan-$__PSBOTAN_BOTAN_VERSION"
 $__PSBOTAN_BOTAN_PLATFORM_DIST_DIR_NAME_FORMAT = @{
-    Emscripten     = "Botan-$__PSBOTAN_BOTAN_VERSION-Esmcripten-Wasm-{0}" # 0=Configuration
+    Emscripten     = "Botan-$__PSBOTAN_BOTAN_VERSION-Emscripten-Wasm-{0}" # 0=Configuration
     Android        = "Botan-$__PSBOTAN_BOTAN_VERSION-Android-Api{0}-{1}-{2}" # 0=ApiLevel / 1=Abi / 2=Configuration
     WindowsDesktop = "Botan-$__PSBOTAN_BOTAN_VERSION-Windows-Desktop-{0}-{1}" # 0=Architecture / 1=Configuration
     WindowsUWP     = "Botan-$__PSBOTAN_BOTAN_VERSION-Windows-UWP-{0}-{1}" # 0=Architecture / 1=Configuration
