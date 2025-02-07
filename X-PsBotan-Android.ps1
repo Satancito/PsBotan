@@ -64,7 +64,7 @@ function Test-DependencyTools {
 
 function Build-BotanLibrary {
     if ([string]::IsNullOrWhiteSpace($AndroidAPI)) {
-        $AndroidAPI = [AndroidNDKApiValidateSet]::ValidValues | Select-Object -Last 1
+        $AndroidAPI = Get-LastAndroidNDKApi
     }
     Assert-AndroidNDKApi -Api $AndroidAPI
     $DestinationDir = [string]::IsNullOrWhiteSpace($DestinationDir) ? "$(Get-CppLibsDir)" : $DestinationDir

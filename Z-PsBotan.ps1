@@ -5,8 +5,8 @@ Import-Module -Name "$PSScriptRoot/submodules/PsCoreFxs/Z-PsCoreFxs.ps1" -Force 
 # MARK: █ Constants
 $__PSBOTAN_TEMP_DIR = "$(Get-UserHome)/.PsBotan"
 $__PSBOTAN_GITHUB_URL = "https://github.com/Satancito/PsBotan.git"; $null = $__PSBOTAN_GITHUB_URL
-$__PSBOTAN_BOTAN_VERSION = "3.4.0" # █> Update on next version.
-$__PSBOTAN_BOTAN_COMPRESSED_FILE_SHA1 = "A3E039F019391B0363A38C07044BD92F9CA360CB" # █> Update on next version.
+$__PSBOTAN_BOTAN_VERSION = "3.7.1" # █> Update on next version.
+$__PSBOTAN_BOTAN_COMPRESSED_FILE_SHA1 = "8EC027DAB6543B3A0D87FD2C77315EE4EDC8A758" # █> Update on next version.
 $__PSBOTAN_BOTAN_MAJOR_VERSION = "$("$__PSBOTAN_BOTAN_VERSION".Split(".") | Select-Object -First 1)"; $null = $__PSBOTAN_BOTAN_MAJOR_VERSION
 $__PSBOTAN_BOTAN_URL = "https://botan.randombit.net/releases/Botan-$__PSBOTAN_BOTAN_VERSION.tar.xz" 
 $__PSBOTAN_BOTAN_TAR_XZ_FILE = "$__PSBOTAN_TEMP_DIR/Botan-$__PSBOTAN_BOTAN_VERSION.tar.xz"
